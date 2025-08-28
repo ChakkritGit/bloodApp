@@ -1,68 +1,168 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: winter;
+}
+
+@font-face {
+  font-family: "IBMPlexSansThaiLooped";
+  src: url("./assets/fonts/IBMPlexSansThaiLooped-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "IBMPlexSansThaiLooped";
+  src: url("./assets/fonts/IBMPlexSansThaiLooped-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "IBMPlexSansThaiLooped";
+  src: url("./assets/fonts/IBMPlexSansThaiLooped-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "IBMPlexSansThaiLooped";
+  src: url("./assets/fonts/IBMPlexSansThaiLooped-Regular.ttf") format("truetype");
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-style: normal;
 }
 
-a {
+@font-face {
+  font-family: "IBMPlexSansThaiLooped";
+  src: url("./assets/fonts/IBMPlexSansThaiLooped-Medium.ttf") format("truetype");
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+  font-style: normal;
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+@font-face {
+  font-family: "IBMPlexSansThaiLooped";
+  src: url("./assets/fonts/IBMPlexSansThaiLooped-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+@font-face {
+  font-family: "IBMPlexSansThaiLooped";
+  src: url("./assets/fonts/IBMPlexSansThaiLooped-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+* {
+  font-family: "IBMPlexSansThaiLooped", sans-serif;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.go2072408551 {
+  @apply !bg-transparent !max-w-none !shadow-none;
+}
+
+.dataTableWrapper {
+  & > div:nth-child(1) {
+    @apply rounded-none;
   }
-  a:hover {
-    color: #747bff;
+
+  & > div > div > div > div > div > div > button {
+    @apply text-inherit;
   }
-  button {
-    background-color: #f9f9f9;
+
+  & > div > div > div {
+    @apply bg-base-100;
+  }
+
+  & > div > div > div > div {
+    @apply bg-base-100 duration-300 ease-linear h-full;
+  }
+
+  & > div > div > div > div > div {
+    & > div {
+      @apply duration-300 ease-linear;
+    }
+
+    @apply bg-transparent !text-base-content !border-b-base-content/10 duration-300 ease-linear;
+  }
+
+  & > div > div > div > div:nth-child(2) > div:hover {
+    @apply duration-300 ease-linear bg-base-300;
+  }
+
+  & > div:nth-child(2) > nav {
+    @apply bg-transparent text-base-content border-t-base-content/10 duration-300 ease-linear;
+
+    & > div:nth-child(4) > button:disabled {
+      @apply !cursor-not-allowed text-base-content/30 fill-base-content/30;
+    }
+
+    & > div:nth-child(4) > button {
+      @apply text-base-content fill-base-content;
+    }
+  }
+}
+
+.react-select__control {
+  @apply !bg-base-100 !rounded-3xl !w-full !h-15 !input;
+}
+
+.react-select__indicator,
+.react-select__dropdown-indicator {
+  @apply fill-base-content;
+}
+
+.react-select__control--is-focused {
+  box-shadow: 0 0 0 1px var(--fallback-p, color(var(--p) / 1)) !important;
+}
+
+.react-select__single-value,
+.react-select__input-container {
+  @apply !text-base-content;
+}
+
+.react-select__single-value {
+  @apply !text-inherit;
+}
+
+.react-select__placeholder {
+  @apply !text-base-content/50;
+}
+
+.react-select__indicator-separator {
+  background-color: var(--fallback-bc, oklch(var(--bc) / 0.25)) !important;
+  @apply !divider-horizontal !mx-1 !my-2 !w-[2px];
+}
+
+.react-select__indicator,
+.react-select__dropdown-indicator {
+  & > svg {
+    fill: var(--fallback-bc, oklch(var(--bc) / 0.25)) !important;
+  }
+}
+
+.react-select__menu {
+  @apply !bg-base-100 !rounded-[24px] !overflow-hidden !p-2 !w-max;
+}
+
+.react-select__menu-list {
+  @apply !flex !flex-col !items-center !justify-center !gap-2 !min-w-[130px];
+}
+
+.react-select__option {
+  @apply !rounded-[16px] !cursor-pointer !p-4 !text-sm;
+}
+
+.react-select__option--is-focused {
+  @apply !bg-base-300;
+}
+
+.react-select__option--is-selected {
+  @apply !bg-neutral !text-neutral-content;
+}
+
+.custom-react-select {
+  & > .react-select__menu > div:nth-child(1) {
+    justify-content: unset !important;
   }
 }
