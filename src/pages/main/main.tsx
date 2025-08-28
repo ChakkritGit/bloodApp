@@ -1,52 +1,118 @@
-import { useState } from 'react'
+import appLogo from '../../assets/images/appLogo.png'
+import { FormEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { IoIosClose } from 'react-icons/io'
+import { showToast } from '../../utils/toast'
+import { BiError, BiErrorCircle } from 'react-icons/bi'
+import axios, { AxiosError } from 'axios'
 
 const Main = () => {
   const { t } = useTranslation()
   const [appointmentId, setAppointmentId] = useState('')
 
-  const handleSearch = () => {
-    alert(`กำลังค้นหาเลขที่ใบนัด: ${appointmentId}`)
+  const handleSearch = async (e: FormEvent) => {
+    e.preventDefault()
+    if (appointmentId.length !== 10) {
+      showToast({
+        type: 'warning',
+        icon: BiErrorCircle,
+        message: t('pleaseInputMoreThanTen'),
+        duration: t('pleaseInputMoreThanTen').length > 27 ? 10000 : 1800,
+        showClose: false
+      })
+    }
+
+    try {
+      const result = await axios.get(
+        `${import.meta.env.VITE_APP_API}/appointment/${appointmentId}`
+      )
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        showToast({
+          type: 'error',
+          icon: BiError,
+          message: error.response?.data.message,
+          duration: error.response?.data.message.length > 27 ? 10000 : 1800,
+          showClose: false
+        })
+      } else {
+        console.error(error)
+      }
+    }
   }
 
   return (
-    <div className='bg-base-200 font-sans h-dvh'>
-      <main className='flex justify-center items-center p-12 md:p-20 px-4 h-full'>
-        <div className='card w-full max-w-sm bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl'>
-          <div className='card-body'>
-            <h2 className='card-title justify-center text-2xl mb-6'>
-              ค้นหาใบนัดหมาย
-            </h2>
+    <div className='bg-base-200 h-dvh'>
+      <header className='fixed w-full bg-base-100 p-4 mx-auto shadow-sm border-b border-base-content/30'>
+        <div className='flex justify-center items-center text-base-content/70'>
+          <h1 className='text-xl font-bold text-center text-base-content truncate'>
+            {t('appName')}
+          </h1>
+        </div>
+      </header>
 
-            <div className='form-control w-full'>
-              <label className='label'>
-                <span className='label-text'>{t('searchAppointment')}</span>
-              </label>
-              <input
-                type='text'
-                placeholder='ตัวอย่าง: APN6708001'
-                className='input input-bordered w-full'
-                value={appointmentId}
-                onChange={e => setAppointmentId(e.target.value)}
-              />
+      <main className='flex justify-center items-center p-12 md:p-20 px-4 h-full'>
+        <div className='card w-full max-w-sm bg-base-100 rounded-[48px] shadow-xl transition-all duration-300 hover:shadow-2xl'>
+          <form onSubmit={handleSearch} className='card-body gap-3'>
+            <div className='avatar justify-center mb-5'>
+              <div className='w-18 rounded-3xl'>
+                <img src={appLogo} />
+              </div>
             </div>
 
-            <div className='card-actions mt-6'>
-              <button className='btn btn-primary w-full' onClick={handleSearch}>
+            <h4 className='card-title justify-center text-lg mb-5'>
+              {t('searchAppointmentLabel')}
+            </h4>
+
+            <div className='form-control w-full'>
+              <label
+                className='input w-full h-13 rounded-3xl'
+                htmlFor='appointmentId'
+              >
+                {appointmentId.length > 0 && <div className='w-8'></div>}
+                <input
+                  id='appointmentId'
+                  type='number'
+                  pattern='\d*'
+                  minLength={10}
+                  maxLength={10}
+                  autoFocus
+                  className='grow text-center font-bold text-xl h-13'
+                  value={appointmentId}
+                  onChange={e => {
+                    if (e.target.value.length <= 10) {
+                      setAppointmentId(e.target.value)
+                    }
+                  }}
+                  required
+                />
+                {appointmentId.length > 0 && (
+                  <kbd
+                    className='kbd kbd-xl p-0 rounded-3xl'
+                    onClick={() => setAppointmentId('')}
+                  >
+                    <IoIosClose size={24} />
+                  </kbd>
+                )}
+              </label>
+            </div>
+
+            <div className='card-actions mt-5'>
+              <button className='btn btn-primary w-full h-13 rounded-3xl text-lg'>
                 {t('search')}
               </button>
             </div>
 
-            <div className='text-center mt-4'>
+            <div className='text-center'>
               <Link
                 to='/appointment'
-                className='link link-hover text-sm text-base-content/70'
+                className='btn w-full h-13 rounded-3xl text-lg'
               >
-                {`> ${t('forOfficials')} <`}
+                {t('forOfficials')}
               </Link>
             </div>
-          </div>
+          </form>
         </div>
       </main>
     </div>

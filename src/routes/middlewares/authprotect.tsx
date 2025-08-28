@@ -71,7 +71,7 @@ const ProtectedRoute = ({ children }: AuthProps) => {
     return null
   }
 
-  return isValid ? children : <Navigate to='/login' />
+  return isValid ? children : <Navigate to='/login' replace={true} />
 }
 
 export function AuthRoute () {

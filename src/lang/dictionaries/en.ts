@@ -1,8 +1,11 @@
 export default {
   translation: {
-    appName: 'Blood Appointment System',
+    appName: 'Off-site blood test appointment system',
     forOfficials : 'For officials',
     search: 'Search',
-    searchAppointment: 'Search Appointment'
+    searchAppointmentLabel: 'Please enter your appointment number.',
+    exampleAppNo: 'Example: 123456',
+    searchAppointment: 'Search appointment',
+    pleaseInputMoreThanTen: 'Please enter a 10-digit ID.'
   }
 }
