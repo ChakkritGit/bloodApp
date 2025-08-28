@@ -269,9 +269,10 @@ const AppointmentNew = () => {
                 </div>
               </div>
               <div className='form-control mt-4'>
-                <label className='label cursor-pointer justify-start gap-4'>
+                <label className='label cursor-pointer justify-start gap-4' htmlFor='termsAndConditions'>
                   <input
                     type='checkbox'
+                    id='termsAndConditions'
                     checked={consent}
                     onChange={() => setConsent(!consent)}
                     className='checkbox'
