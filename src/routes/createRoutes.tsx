@@ -3,21 +3,26 @@ import { AuthRoute } from './middlewares/authprotect'
 import { LogoutAuth } from './middlewares/authLogin'
 import ErrorPage from './pages/errorPage'
 import NotFound from './pages/notFound'
-import Test from '../pages/test'
+import Main from '../pages/main/main'
 
 const router = () =>
   createBrowserRouter([
     {
       path: '/',
-      element: <Test />,
+      element: <Main />,
       errorElement: <ErrorPage />
     },
     {
-      path: '/manage',
+      path: '/appointment/search',
+      element: <Main />,
+      errorElement: <ErrorPage />
+    },
+    {
+      path: '/appointment',
       element: <AuthRoute />,
       children: [
         {
-          path: '/manage',
+          path: '/appointment',
           element: <div>Layout</div>,
           errorElement: <ErrorPage />,
           children: [

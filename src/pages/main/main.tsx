@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { HiHome, HiUsers } from 'react-icons/hi'
+import { Link } from 'react-router-dom'
 
-const Test = () => {
+const Main = () => {
   const [appointmentId, setAppointmentId] = useState('')
 
   const handleSearch = () => {
-    // ใส่ Logic การค้นหาที่นี่
     alert(`กำลังค้นหาเลขที่ใบนัด: ${appointmentId}`)
   }
 
@@ -14,15 +13,9 @@ const Test = () => {
       {/* ส่วน Header */}
       <header className='p-4 max-w-4xl mx-auto'>
         <div className='flex justify-between items-center text-base-content/70'>
-          <button className='btn btn-ghost btn-circle'>
-            <HiHome size={24} />
-          </button>
           <h1 className='text-xl md:text-2xl font-bold text-center text-base-content'>
             ระบบนัดหมายเจาะเลือดนอกสถานที่
           </h1>
-          <button className='btn btn-ghost btn-circle'>
-            <HiUsers size={24} />
-          </button>
         </div>
         <div className='divider mt-2'></div>
       </header>
@@ -57,12 +50,12 @@ const Test = () => {
 
             {/* ลิงก์สำหรับเจ้าหน้าที่ */}
             <div className='text-center mt-4'>
-              <a
-                href='#'
+              <Link
+                to='/appointment'
                 className='link link-hover text-sm text-base-content/70'
               >
                 สำหรับเจ้าหน้าที่
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -71,4 +64,4 @@ const Test = () => {
   )
 }
 
-export default Test
+export default Main

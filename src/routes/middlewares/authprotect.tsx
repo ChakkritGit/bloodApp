@@ -3,7 +3,6 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import CryptoJS from 'crypto-js'
 import { RootState } from '../../redux/reducers/rootReducer'
-import { CookieDecode } from '../../types/cookie.type'
 import {
   cookieDecodeObject,
   cookieOptions,
@@ -14,6 +13,7 @@ import {
   setCookieDecode,
   setCookieEncode
 } from '../../redux/actions/utilsActions'
+import { CookieDecode } from '../../pages/types/cookie.type'
 
 type AuthProps = {
   children: ReactElement

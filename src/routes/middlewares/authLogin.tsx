@@ -7,7 +7,7 @@ export const LogoutAuth = () => {
   const { cookieEncode } = useSelector((state: RootState) => state.utils)
 
   if (cookieEncode !== undefined) {
-    return <Navigate to='/manage' />
+    return <Navigate to='/appointment' />
   }
 
   return <Login />
