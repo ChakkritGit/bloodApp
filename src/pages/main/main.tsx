@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 const Main = () => {
+  const { t } = useTranslation()
   const [appointmentId, setAppointmentId] = useState('')
 
   const handleSearch = () => {
@@ -9,29 +11,17 @@ const Main = () => {
   }
 
   return (
-    <div data-theme='lofi' className='min-h-screen bg-base-200 font-sans'>
-      {/* ส่วน Header */}
-      <header className='p-4 max-w-4xl mx-auto'>
-        <div className='flex justify-between items-center text-base-content/70'>
-          <h1 className='text-xl md:text-2xl font-bold text-center text-base-content'>
-            ระบบนัดหมายเจาะเลือดนอกสถานที่
-          </h1>
-        </div>
-        <div className='divider mt-2'></div>
-      </header>
-
-      {/* ส่วน Content หลัก */}
-      <main className='flex justify-center items-start pt-12 md:pt-20 px-4'>
+    <div className='bg-base-200 font-sans h-dvh'>
+      <main className='flex justify-center items-center p-12 md:p-20 px-4 h-full'>
         <div className='card w-full max-w-sm bg-base-100 shadow-xl transition-all duration-300 hover:shadow-2xl'>
           <div className='card-body'>
             <h2 className='card-title justify-center text-2xl mb-6'>
               ค้นหาใบนัดหมาย
             </h2>
 
-            {/* Form สำหรับกรอกข้อมูล */}
             <div className='form-control w-full'>
               <label className='label'>
-                <span className='label-text'>กรุณากรอกเลขที่ใบนัด</span>
+                <span className='label-text'>{t('searchAppointment')}</span>
               </label>
               <input
                 type='text'
@@ -44,17 +34,16 @@ const Main = () => {
 
             <div className='card-actions mt-6'>
               <button className='btn btn-primary w-full' onClick={handleSearch}>
-                ค้นหา
+                {t('search')}
               </button>
             </div>
 
-            {/* ลิงก์สำหรับเจ้าหน้าที่ */}
             <div className='text-center mt-4'>
               <Link
                 to='/appointment'
                 className='link link-hover text-sm text-base-content/70'
               >
-                สำหรับเจ้าหน้าที่
+                {`> ${t('forOfficials')} <`}
               </Link>
             </div>
           </div>
