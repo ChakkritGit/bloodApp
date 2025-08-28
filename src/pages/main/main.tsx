@@ -115,7 +115,7 @@ const Main = () => {
             <div className='card-actions mt-5'>
               <button
                 disabled={isLoading}
-                className='btn btn-primary w-full h-13 rounded-3xl text-lg'
+                className='btn btn-primary w-full h-13 rounded-3xl text-lg font-bold'
               >
                 {isLoading ? (
                   <span className='loading loading-spinner loading-md'></span>
@@ -128,7 +128,7 @@ const Main = () => {
             <div className='text-center'>
               <Link
                 to='/appointment'
-                className='btn w-full h-13 rounded-3xl text-lg'
+                className='btn w-full h-13 rounded-3xl text-lg font-bold'
               >
                 {t('forOfficials')}
               </Link>

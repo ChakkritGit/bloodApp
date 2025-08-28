@@ -2,9 +2,11 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
-import { HiPhoto, HiXMark } from 'react-icons/hi2'
+import { HiPhoto } from 'react-icons/hi2'
 import { BiArrowBack } from 'react-icons/bi'
 import { useTranslation } from 'react-i18next'
+import { IoIosClose } from 'react-icons/io'
+import LocationMap from '../../utils/LocationMap'
 
 const AppointmentNew = () => {
   const { t } = useTranslation()
@@ -25,7 +27,7 @@ const AppointmentNew = () => {
   }
 
   const [formData, setFormData] = useState(initialFormData)
-  const [consent, setConsent] = useState(true)
+  const [consent, setConsent] = useState(false)
   const hiddenDateInputRef = useRef<HTMLInputElement>(null)
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -90,13 +92,13 @@ const AppointmentNew = () => {
   return (
     <div className='min-h-screen bg-base-200 p-4'>
       <button
-        className='btn btn-primary h-12 rounded-3xl'
+        className='btn text-primary px-2 h-10 rounded-3xl'
         onClick={() => window.history.back()}
       >
         <BiArrowBack size={24} />
         <span>{t('back')}</span>
       </button>
-      <div className='max-w-4xl mx-auto mt-8'>
+      <div className='max-w-4xl mx-auto mt-5'>
         <header className='text-center mb-8'>
           <h1 className='text-3xl font-bold'>รายละเอียดใบนัดหมาย</h1>
           <p className='text-base-content/70 font-medium mt-3'>เลขที่ใบนัด</p>
@@ -105,7 +107,7 @@ const AppointmentNew = () => {
           </h2>
         </header>
 
-        <div className='card w-full bg-base-100 shadow-xl'>
+        <div className='card w-full bg-base-100 shadow-xl rounded-[48px]'>
           <div className='card-body gap-6'>
             <section>
               <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
@@ -143,7 +145,7 @@ const AppointmentNew = () => {
                   <input
                     type='text'
                     value={formData.patientInfo}
-                    className='input input-bordered'
+                    className='input input-bordered h-13 rounded-3xl'
                     disabled
                   />
                 </div>
@@ -156,7 +158,7 @@ const AppointmentNew = () => {
                     readOnly
                     value={formattedThaiDate}
                     onClick={handleVisibleInputClick}
-                    className='input input-bordered w-full cursor-pointer'
+                    className='input input-bordered w-full h-13 rounded-3xl cursor-pointer'
                     placeholder='กรุณาเลือกวันที่'
                   />
 
@@ -177,7 +179,7 @@ const AppointmentNew = () => {
                     name='phone1'
                     value={formData.phone1}
                     onChange={handleInputChange}
-                    className='input input-bordered'
+                    className='input input-bordered h-13 rounded-3xl'
                   />
                 </div>
                 <div className='form-control'>
@@ -189,7 +191,7 @@ const AppointmentNew = () => {
                     name='phone2'
                     value={formData.phone2}
                     onChange={handleInputChange}
-                    className='input input-bordered'
+                    className='input input-bordered h-13 rounded-3xl'
                   />
                 </div>
                 <div className='form-control md:col-span-2'>
@@ -200,7 +202,7 @@ const AppointmentNew = () => {
                     name='serviceLocation'
                     value={formData.serviceLocation}
                     onChange={handleInputChange}
-                    className='textarea textarea-bordered h-24'
+                    className='textarea textarea-bordered h-24 rounded-3xl'
                   ></textarea>
                 </div>
               </div>
@@ -215,7 +217,7 @@ const AppointmentNew = () => {
                   <label className='label'>
                     <span className='label-text'>ภาพใบนัด</span>
                   </label>
-                  <div className='w-full h-48 rounded-lg relative'>
+                  <div className='w-full h-52 rounded-3xl relative'>
                     <input
                       type='file'
                       accept='image/*'
@@ -230,20 +232,20 @@ const AppointmentNew = () => {
                         <img
                           src={previewUrl}
                           alt='Preview'
-                          className='w-full h-full object-cover rounded-lg shadow-md'
+                          className='w-full h-full object-cover rounded-3xl'
                         />
                         <button
                           onClick={handleRemoveImage}
-                          className='btn bg-black/15 btn-circle btn-sm border-0 absolute top-2 right-2 shadow-lg'
+                          className='btn bg-black/15 btn-circle btn-sm border-0 absolute top-3 right-3'
                           aria-label='Remove image'
                         >
-                          <HiXMark size={16} />
+                          <IoIosClose size={20} />
                         </button>
                       </div>
                     ) : (
                       <label
                         htmlFor='imageUploader'
-                        className='w-full h-full border-2 border-dashed rounded-lg flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'
+                        className='w-full h-full border-2 border-dashed rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'
                       >
                         <HiPhoto
                           size={40}
@@ -257,8 +259,8 @@ const AppointmentNew = () => {
                   </div>
                 </div>
                 <div>
-                  <div className='w-full h-40 bg-base-200 rounded-lg flex items-center justify-center text-base-content/50'>
-                    Map Area
+                  <div className='w-full h-52 bg-base-200 rounded-3xl flex items-center justify-center text-base-content/50 overflow-hidden'>
+                    <LocationMap lat={formData.lat} lon={formData.lon} />
                   </div>
                   <p className='text-xs text-center mt-2 text-base-content/70'>
                     LAT: {formData.lat.toFixed(5)}, LON:{' '}
@@ -281,9 +283,19 @@ const AppointmentNew = () => {
               </div>
             </section>
 
-            <div className='card-actions justify-between border-t pt-6 mt-4'>
-              <button className='btn btn-error'>ยกเลิก</button>
-              <button className='btn btn-success'>บันทึกข้อมูล</button>
+            <div className='card-actions flex-col justify-between border-t pt-6 mt-4'>
+              <button
+                disabled={!consent}
+                className='btn btn-primary w-full h-13 rounded-3xl text-lg font-bold'
+              >
+                บันทึกข้อมูล
+              </button>
+              <button
+                className='btn w-full h-13 rounded-3xl text-lg font-bold'
+                onClick={() => window.history.back()}
+              >
+                ยกเลิก
+              </button>
             </div>
           </div>
         </div>
