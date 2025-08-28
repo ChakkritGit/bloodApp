@@ -6,6 +6,8 @@ export default {
     searchAppointmentLabel: 'กรุณากรอกเลขที่ใบนัด',
     exampleAppNo: 'ตัวอย่าง: 123456',
     searchAppointment: 'ค้นหาใบนัดหมาย',
-    pleaseInputMoreThanTen: 'กรุณากรอก ID ให้ครบ 10 ตัว'
+    pleaseInputMoreThanTen: 'กรุณากรอก ID ให้ครบ 10 ตัว',
+
+    back: 'ย้อนกลับ'
   }
 }

@@ -39,7 +39,7 @@ const CustomToast = ({
     <div
       className={`${
         t.visible ? 'animate-enter' : 'animate-leave'
-      } bg-base-100 min-w-[256px] w-full max-w-[380px] shadow-lg rounded-full pointer-events-auto animate-jelly-bounce overflow-hidden`}
+      } bg-base-100 min-w-[256px] w-full max-w-[350px] shadow-lg rounded-full pointer-events-auto animate-jelly-bounce overflow-hidden`}
     >
       <div className={`flex items-center p-2 rounded-full ${styles.bg}`}>
         <div
@@ -56,8 +56,8 @@ const CustomToast = ({
           </div>
         </div>
         <div className='flex-1 mx-4'>
-          <p className='text-lg font-medium text-base-content max-w-[500px] truncate'>
-            <MarqueeText speed={100} className='text-lg font-medium'>
+          <p className='text-lg font-medium text-base-content max-w-[350px] truncate'>
+            <MarqueeText speed={100} className='text-lg font-medium pr-25'>
               {message}
             </MarqueeText>
           </p>

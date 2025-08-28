@@ -4,6 +4,8 @@ import { LogoutAuth } from './middlewares/authLogin'
 import ErrorPage from './pages/errorPage'
 import NotFound from './pages/notFound'
 import Main from '../pages/main/main'
+import AppointmentNew from '../pages/appointment/appointmentNew'
+import AppointmentSearch from '../pages/appointment/appointmentSearch'
 
 const router = () =>
   createBrowserRouter([
@@ -13,8 +15,13 @@ const router = () =>
       errorElement: <ErrorPage />
     },
     {
-      path: '/appointment/search',
-      element: <Main />,
+      path: '/appointment/search/:id',
+      element: <AppointmentSearch />,
+      errorElement: <ErrorPage />
+    },
+    {
+      path: '/appointment/new/:id',
+      element: <AppointmentNew />,
       errorElement: <ErrorPage />
     },
     {

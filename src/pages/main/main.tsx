@@ -1,15 +1,18 @@
 import appLogo from '../../assets/images/appLogo.png'
 import { FormEvent, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { IoIosClose } from 'react-icons/io'
 import { showToast } from '../../utils/toast'
 import { BiError, BiErrorCircle } from 'react-icons/bi'
 import axios, { AxiosError } from 'axios'
+import { ApiResponse } from '../../redux/types/api.response.type'
 
 const Main = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [appointmentId, setAppointmentId] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault()
@@ -21,12 +24,21 @@ const Main = () => {
         duration: t('pleaseInputMoreThanTen').length > 27 ? 10000 : 1800,
         showClose: false
       })
+
+      return
     }
 
+    setIsLoading(true)
     try {
-      const result = await axios.get(
+      const result = await axios.get<ApiResponse<any>>(
         `${import.meta.env.VITE_APP_API}/appointment/${appointmentId}`
       )
+
+      if (result.data.data) {
+        navigate(`/appointment/search/${appointmentId}`)
+      } else {
+        navigate(`/appointment/new/${appointmentId}`)
+      }
     } catch (error) {
       if (error instanceof AxiosError) {
         showToast({
@@ -39,11 +51,13 @@ const Main = () => {
       } else {
         console.error(error)
       }
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className='bg-base-200 h-dvh'>
+    <div className='min-h-screen bg-base-200 h-dvh'>
       <header className='fixed w-full bg-base-100 p-4 mx-auto shadow-sm border-b border-base-content/30'>
         <div className='flex justify-center items-center text-base-content/70'>
           <h1 className='text-xl font-bold text-center text-base-content truncate'>
@@ -53,7 +67,7 @@ const Main = () => {
       </header>
 
       <main className='flex justify-center items-center p-12 md:p-20 px-4 h-full'>
-        <div className='card w-full max-w-sm bg-base-100 rounded-[48px] shadow-xl transition-all duration-300 hover:shadow-2xl'>
+        <div className='card w-full max-w-sm bg-base-100 rounded-[48px] shadow-xl'>
           <form onSubmit={handleSearch} className='card-body gap-3'>
             <div className='avatar justify-center mb-5'>
               <div className='w-18 rounded-3xl'>
@@ -99,8 +113,15 @@ const Main = () => {
             </div>
 
             <div className='card-actions mt-5'>
-              <button className='btn btn-primary w-full h-13 rounded-3xl text-lg'>
-                {t('search')}
+              <button
+                disabled={isLoading}
+                className='btn btn-primary w-full h-13 rounded-3xl text-lg'
+              >
+                {isLoading ? (
+                  <span className='loading loading-spinner loading-md'></span>
+                ) : (
+                  t('search')
+                )}
               </button>
             </div>
 
