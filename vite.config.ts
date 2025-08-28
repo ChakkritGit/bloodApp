@@ -17,8 +17,8 @@ export default defineConfig({
         name: 'Blood Appointment System',
         short_name: 'BAS',
         description: '-',
-        theme_color: '#F3EBDF',
-        background_color: '#F3EBDF',
+        theme_color: 'oklch(97.466% 0.011 259.822)',
+        background_color: 'oklch(97.466% 0.011 259.822)',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',
@@ -131,6 +131,9 @@ export default defineConfig({
     fs: {
       strict: true,
       deny: ['.env', '.env.*', '*.{crt,pem}', 'custom.secret']
-    }
+    },
+  },
+  optimizeDeps: {
+    exclude: ['fs']
   }
 })
