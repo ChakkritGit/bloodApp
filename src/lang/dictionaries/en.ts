@@ -6,7 +6,7 @@ export default {
     searchAppointmentLabel: 'Please enter your appointment number.',
     exampleAppNo: 'Example: 123456',
     searchAppointment: 'Search appointment',
-    pleaseInputMoreThanTen: 'Please enter a 10-digit appointment number.',
+    pleaseInputMoreThanTen: 'Please enter a 12-digit appointment number.',
 
     back: 'Back',
 

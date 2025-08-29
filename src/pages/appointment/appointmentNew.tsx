@@ -1,5 +1,5 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
 import { HiPhoto } from 'react-icons/hi2'
@@ -10,6 +10,8 @@ import LocationMap from '../../utils/LocationMap'
 const AppointmentNew = () => {
   const { t } = useTranslation()
   const { id } = useParams()
+  const navigate = useNavigate()
+  const [isButtonFixed, setIsButtonFixed] = useState(false)
 
   const initialFormData = {
     appointmentId: id,
@@ -32,6 +34,7 @@ const AppointmentNew = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -88,16 +91,60 @@ const AppointmentNew = () => {
     return () => URL.revokeObjectURL(objectUrl)
   }, [selectedFile])
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (buttonRef.current) {
+        if (buttonRef.current.getBoundingClientRect().top < 16) {
+          setIsButtonFixed(true)
+        } else {
+          setIsButtonFixed(false)
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
   return (
     <div className='min-h-screen bg-base-200 p-4'>
       <button
-        className='btn text-primary pr-2 pl-0 h-10 rounded-3xl'
-        onClick={() => window.history.back()}
+        ref={buttonRef}
+        className={`btn text-primary pr-2 pl-0 h-10 rounded-3xl transition-opacity ${
+          isButtonFixed ? 'invisible' : 'visible'
+        }`}
+        onClick={() => navigate('/', { replace: true })}
       >
         <IoIosArrowBack size={24} />
         <span>{t('back')}</span>
       </button>
-      <div className='max-w-4xl mx-auto mt-5'>
+      <div
+        className={`fixed left-0 top-0 p-2 w-full bg-base-200/30 backdrop-blur-lg shadow-md z-50 transition-transform duration-300 ease-in-out ${
+          isButtonFixed
+            ? 'translate-y-0 opacity-100'
+            : '-translate-y-10 opacity-0'
+        }`}
+      >
+        <div className='relative flex items-center justify-center h-10'>
+          <button
+            className='btn btn-ghost text-primary pr-2 pl-0 h-10 rounded-3xl absolute left-0'
+            onClick={() => navigate('/', { replace: true })}
+          >
+            <IoIosArrowBack size={24} />
+            <span>{t('back')}</span>
+          </button>
+          <div className='flex flex-col items-center'>
+            <span className='text-xs'>{t('appointmentNumber')}</span>
+            <h3 className='text-base text-primary font-bold'>
+              {formData.appointmentId}
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div className='max-w-4xl mx-auto pt-8'>
         <header className='text-center mb-8'>
           <h1 className='text-3xl font-bold'>{t('appointmentAddHeadTitle')}</h1>
           <p className='text-base-content/70 font-medium mt-3'>
@@ -317,7 +364,7 @@ const AppointmentNew = () => {
               </button>
               <button
                 className='btn w-full h-13 rounded-3xl text-lg font-bold'
-                onClick={() => window.history.back()}
+                onClick={() => navigate('/', { replace: true })}
               >
                 ยกเลิก
               </button>

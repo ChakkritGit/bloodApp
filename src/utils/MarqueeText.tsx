@@ -61,7 +61,7 @@ const MarqueeText: React.FC<MarqueeTextProps> = ({
         <span
           className={`${
             isOverflowing ? marqueeTextClass : 'inline-block'
-          } px-2`}
+          } px-2 pr-8`}
           style={isOverflowing ? marqueeStyle : {}}
         >
           {children}

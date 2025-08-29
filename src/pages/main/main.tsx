@@ -16,7 +16,7 @@ const Main = () => {
 
   const handleSearch = async (e: FormEvent) => {
     e.preventDefault()
-    if (appointmentId.length !== 10) {
+    if (appointmentId.length !== 12) {
       showToast({
         type: 'warning',
         icon: BiErrorCircle,
@@ -95,7 +95,7 @@ const Main = () => {
                   className='grow text-center font-bold text-xl h-13'
                   value={appointmentId}
                   onChange={e => {
-                    if (e.target.value.length <= 10) {
+                    if (e.target.value.length <= 12) {
                       setAppointmentId(e.target.value)
                     }
                   }}
