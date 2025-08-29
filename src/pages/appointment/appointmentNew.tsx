@@ -6,6 +6,9 @@ import { HiPhoto } from 'react-icons/hi2'
 import { useTranslation } from 'react-i18next'
 import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
 import LocationMap from '../../utils/LocationMap'
+import { AxiosError } from 'axios'
+import { showToast } from '../../utils/toast'
+import { BiError } from 'react-icons/bi'
 
 const AppointmentNew = () => {
   const { t } = useTranslation()
@@ -72,7 +75,25 @@ const AppointmentNew = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const paragraphRef = useRef<HTMLParagraphElement>(null)
+  const paragraphRef = useRef<HTMLHeadingElement>(null)
+
+  const handleSubmit = async () => {
+    try {
+      console.log(formData)
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        showToast({
+          type: 'error',
+          icon: BiError,
+          message: error.response?.data.message,
+          duration: error.response?.data.message.length > 27 ? 10000 : 1800,
+          showClose: false
+        })
+      } else {
+        console.error(error)
+      }
+    }
+  }
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -149,7 +170,7 @@ const AppointmentNew = () => {
   useEffect(() => {
     const handleScroll = () => {
       if (paragraphRef.current) {
-        if (paragraphRef.current.getBoundingClientRect().bottom < 5) {
+        if (paragraphRef.current.getBoundingClientRect().bottom < 16) {
           setIsButtonFixed(true)
         } else {
           setIsButtonFixed(false)
@@ -167,7 +188,7 @@ const AppointmentNew = () => {
   return (
     <div className='min-h-screen bg-base-200 p-4'>
       <button
-        className={`btn btn-ghost text-primary pr-2 pl-0 h-10 rounded-3xl transition-opacity ${
+        className={`btn btn-ghost text-primary active:text-primary/50 pr-2 pl-0 h-10 rounded-3xl transition-all ${
           isButtonFixed ? 'invisible' : 'visible'
         }`}
         onClick={() => navigate('/', { replace: true })}
@@ -176,23 +197,28 @@ const AppointmentNew = () => {
         <span>{t('back')}</span>
       </button>
       <div
-        className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-200/30 backdrop-blur-lg shadow-md z-50 transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-200/30 backdrop-blur-lg shadow-md z-50 transition-all duration-300 ease-in-out ${
           isButtonFixed
             ? 'translate-y-0 opacity-100'
-            : '-translate-y-10 opacity-0'
+            : '-translate-y-full opacity-0'
         }`}
       >
         <div className='relative flex items-center justify-center h-10 overflow-hidden'>
           <button
-            className='btn btn-ghost text-primary pr-2 pl-0 h-10 rounded-3xl absolute left-0'
+            className={`btn btn-ghost text-primary active:text-primary/50 pr-2 pl-0 h-10 rounded-3xl absolute left-0 transition-all duration-300 ${
+              isButtonFixed ? 'opacity-100' : 'opacity-0'
+            }`}
             onClick={() => navigate('/', { replace: true })}
           >
             <IoIosArrowBack size={24} />
             <span>{t('back')}</span>
           </button>
+
           <div
-            className={`flex flex-col items-center ${
-              isButtonFixed ? 'animate-fadeInUp-delayed' : ''
+            className={`flex flex-col items-center cursor-pointer transition-all duration-300 ease-in-out ${
+              isButtonFixed
+                ? 'translate-y-0 opacity-100 delay-100'
+                : 'translate-y-5 opacity-0'
             }`}
             onClick={() => {
               window.scrollTo({
@@ -209,26 +235,26 @@ const AppointmentNew = () => {
         </div>
       </div>
       <div className='max-w-4xl mx-auto pt-8'>
-        <header className='text-center mb-8'>
+        <header className={`text-center transition-all duration-300 ease-in-out ${isButtonFixed ? 'opacity-0' : 'opacity-100'}`}>
           <h1 className='text-3xl font-bold'>{t('appointmentAddHeadTitle')}</h1>
-          <p
-            ref={paragraphRef}
-            className='text-base-content/70 font-medium mt-3'
-          >
+          <p className='text-base-content/70 font-medium mt-3'>
             {t('appointmentNumber')}
           </p>
-          <h2 className='mt-1 text-primary text-2xl font-bold'>
+          <h2
+            ref={paragraphRef}
+            className='mt-1 text-primary text-2xl font-bold'
+          >
             {formData.f_appidno}
           </h2>
         </header>
 
-        <div className='card w-full bg-base-100 shadow-xl rounded-[48px]'>
+        <div className={`card w-full bg-base-100 shadow-xl rounded-[48px] transition-all duration-300 ease-in-out ${isButtonFixed ? 'mt-20' : 'mt-8'}`}>
           <div className='card-body gap-6'>
             <section>
               <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
                 {t('detailStatus')}
               </h3>
-              <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+              <div className='grid grid-cols-1 gap-4'>
                 <div>
                   <div className='text-sm text-base-content/70'>
                     {t('lastStatus')}
@@ -260,7 +286,7 @@ const AppointmentNew = () => {
               <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
                 ข้อมูลผู้ป่วยและการนัดหมาย
               </h3>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='grid grid-cols-1 gap-4'>
                 <div className='form-control'>
                   <label className='label'>
                     <span className='label-text'>ผู้ทำนัด</span>
@@ -274,7 +300,7 @@ const AppointmentNew = () => {
                         f_appcreatebyname: e.target.value
                       })
                     }
-                    className='input input-bordered h-13 rounded-3xl'
+                    className='input input-bordered h-13 w-full rounded-3xl'
                   />
                 </div>
                 <div className='form-control'>
@@ -290,7 +316,7 @@ const AppointmentNew = () => {
                         f_appcreateforname: e.target.value
                       })
                     }
-                    className='input input-bordered h-13 rounded-3xl'
+                    className='input input-bordered h-13 w-full rounded-3xl'
                   />
                 </div>
                 <div className='form-control'>
@@ -323,7 +349,7 @@ const AppointmentNew = () => {
                     name='f_appcreatecontacttelephone'
                     value={formData.f_appcreatecontacttelephone}
                     onChange={handleInputChange}
-                    className='input input-bordered h-13 rounded-3xl'
+                    className='input input-bordered h-13 w-full rounded-3xl'
                   />
                 </div>
                 <div className='form-control'>
@@ -335,10 +361,10 @@ const AppointmentNew = () => {
                     name='f_appcreatecontacttelephonetwo'
                     value={formData.f_appcreatecontacttelephonetwo}
                     onChange={handleInputChange}
-                    className='input input-bordered h-13 rounded-3xl'
+                    className='input input-bordered h-13 w-full rounded-3xl'
                   />
                 </div>
-                <div className='form-control md:col-span-2'>
+                <div className='form-control'>
                   <label className='label'>
                     <span className='label-text'>สถานที่รับบริการ</span>
                   </label>
@@ -346,7 +372,7 @@ const AppointmentNew = () => {
                     name='f_appcreatecontactaddress'
                     value={formData.f_appcreatecontactaddress}
                     onChange={handleInputChange}
-                    className='textarea textarea-bordered h-24 rounded-3xl'
+                    className='textarea textarea-bordered h-24 w-full rounded-3xl'
                   ></textarea>
                 </div>
               </div>
@@ -356,7 +382,7 @@ const AppointmentNew = () => {
               <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
                 แผนที่และไฟล์แนบ
               </h3>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-6 items-start'>
+              <div className='grid grid-cols-1 gap-6 items-start'>
                 <div className='form-control w-full'>
                   <label className='label'>
                     <span className='label-text'>ภาพใบนัด</span>
@@ -439,6 +465,7 @@ const AppointmentNew = () => {
               <button
                 disabled={!consent}
                 className='btn btn-primary w-full h-13 rounded-3xl text-lg font-bold'
+                onClick={handleSubmit}
               >
                 บันทึกข้อมูล
               </button>
