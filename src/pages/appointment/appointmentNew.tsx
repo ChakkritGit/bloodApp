@@ -12,29 +12,67 @@ const AppointmentNew = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [isButtonFixed, setIsButtonFixed] = useState(false)
-
-  const initialFormData = {
-    appointmentId: id,
-    status: '',
-    confirmer: '',
-    creator: '',
-    patientInfo: '',
-    doctorDueDate: '',
-    phone1: '',
-    phone2: '',
-    serviceLocation: '',
-    lat: 13.839735640059327,
-    lon: 100.55967513430038
-  }
-
-  const [formData, setFormData] = useState(initialFormData)
+  const [formData, setFormData] = useState({
+    f_appidno: id,
+    f_appidgroup: 0,
+    f_appidname: '',
+    f_appstepno: 0,
+    f_appcreatebyname: '',
+    f_appcreatedatetime: null,
+    f_appcreateforhn: '',
+    f_appcreateforname: '',
+    f_appcreatefordatetime: null,
+    f_appcreateconfirmname: '',
+    f_appcreateconfirmdatetime: null,
+    f_appcreatecontacttelephone: '',
+    f_appcreatecontacttelephonetwo: '',
+    f_appcreatecontactaddress: '',
+    f_appcreatecontactlat: '',
+    f_appcreatecontactlon: '',
+    f_appcreatecontactacc: '',
+    f_appdoctorduedate: '',
+    f_appadminduedate: '',
+    f_appadmindueque: 0,
+    f_appadminduequemax: 0,
+    f_appadminconfirmdate: '',
+    f_appadminconfirmtime: '',
+    f_appadminconfirmque: 0,
+    f_appadminconfirmvisitedate: null,
+    f_appcancelname: '',
+    f_appcanceldatetime: null,
+    f_apppayby: '',
+    f_apppaydatetime: null,
+    f_apppayprice: 0,
+    f_apppictureappdoc: '',
+    f_apppictureappdocdatetime: null,
+    f_apppicturelisttestdoc: '',
+    f_apppicturelisttestdocdatetime: null,
+    f_apppicturebloodtube: '',
+    f_apppicturebloodtubedatetime: null,
+    f_apppictureslipdoc: '',
+    f_apppictureslipdocdatetime: null,
+    f_apppicturepatient: '',
+    f_apppicturepatientdatetime: null,
+    f_apppictureuser: '',
+    f_apppictureuserdatetime: null,
+    f_appadminvisitfullname: '',
+    f_appadminvisittelephone: '',
+    f_appadminvisitdatetime: null,
+    f_apppatientproveinfodatetime: null,
+    f_apppatientproveinfostatus: 0,
+    f_apppatientproveinfobyname: '',
+    f_appcomment: '',
+    f_appstatus: 0,
+    f_appbastatus: 0,
+    f_applastmodified: null
+  })
   const [consent, setConsent] = useState(false)
   const hiddenDateInputRef = useRef<HTMLInputElement>(null)
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const buttonRef = useRef<HTMLButtonElement>(null)
+  const paragraphRef = useRef<HTMLParagraphElement>(null)
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -43,14 +81,14 @@ const AppointmentNew = () => {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const [dateValue, setDateValue] = useState('2025-08-25')
-
-  const formattedThaiDate = dateValue
-    ? format(new Date(dateValue), 'd MMMM yyyy', { locale: th })
+  const formattedThaiDate = formData.f_appdoctorduedate
+    ? format(new Date(formData.f_appdoctorduedate), 'd MMMM yyyy', {
+        locale: th
+      })
     : 'กรุณาเลือกวันที่'
 
   const handleDateChange = (e: any) => {
-    setDateValue(e.target.value)
+    setFormData({ ...formData, f_appdoctorduedate: e.target.value })
   }
 
   const handleVisibleInputClick = () => {
@@ -80,6 +118,23 @@ const AppointmentNew = () => {
   }
 
   useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          setFormData(prev => ({
+            ...prev,
+            f_appcreatecontactlat: position.coords.latitude.toString(),
+            f_appcreatecontactlon: position.coords.longitude.toString()
+          }))
+        },
+        error => {
+          console.error('Error getting location:', error)
+        }
+      )
+    }
+  }, [])
+
+  useEffect(() => {
     if (!selectedFile) {
       setPreviewUrl('')
       return
@@ -93,8 +148,8 @@ const AppointmentNew = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (buttonRef.current) {
-        if (buttonRef.current.getBoundingClientRect().top < 16) {
+      if (paragraphRef.current) {
+        if (paragraphRef.current.getBoundingClientRect().bottom < 5) {
           setIsButtonFixed(true)
         } else {
           setIsButtonFixed(false)
@@ -112,8 +167,7 @@ const AppointmentNew = () => {
   return (
     <div className='min-h-screen bg-base-200 p-4'>
       <button
-        ref={buttonRef}
-        className={`btn text-primary pr-2 pl-0 h-10 rounded-3xl transition-opacity ${
+        className={`btn btn-ghost text-primary pr-2 pl-0 h-10 rounded-3xl transition-opacity ${
           isButtonFixed ? 'invisible' : 'visible'
         }`}
         onClick={() => navigate('/', { replace: true })}
@@ -122,13 +176,13 @@ const AppointmentNew = () => {
         <span>{t('back')}</span>
       </button>
       <div
-        className={`fixed left-0 top-0 p-2 w-full bg-base-200/30 backdrop-blur-lg shadow-md z-50 transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-200/30 backdrop-blur-lg shadow-md z-50 transition-transform duration-300 ease-in-out ${
           isButtonFixed
             ? 'translate-y-0 opacity-100'
             : '-translate-y-10 opacity-0'
         }`}
       >
-        <div className='relative flex items-center justify-center h-10'>
+        <div className='relative flex items-center justify-center h-10 overflow-hidden'>
           <button
             className='btn btn-ghost text-primary pr-2 pl-0 h-10 rounded-3xl absolute left-0'
             onClick={() => navigate('/', { replace: true })}
@@ -136,10 +190,20 @@ const AppointmentNew = () => {
             <IoIosArrowBack size={24} />
             <span>{t('back')}</span>
           </button>
-          <div className='flex flex-col items-center'>
+          <div
+            className={`flex flex-col items-center ${
+              isButtonFixed ? 'animate-fadeInUp-delayed' : ''
+            }`}
+            onClick={() => {
+              window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+              })
+            }}
+          >
             <span className='text-xs'>{t('appointmentNumber')}</span>
             <h3 className='text-base text-primary font-bold'>
-              {formData.appointmentId}
+              {formData.f_appidno}
             </h3>
           </div>
         </div>
@@ -147,11 +211,14 @@ const AppointmentNew = () => {
       <div className='max-w-4xl mx-auto pt-8'>
         <header className='text-center mb-8'>
           <h1 className='text-3xl font-bold'>{t('appointmentAddHeadTitle')}</h1>
-          <p className='text-base-content/70 font-medium mt-3'>
+          <p
+            ref={paragraphRef}
+            className='text-base-content/70 font-medium mt-3'
+          >
             {t('appointmentNumber')}
           </p>
           <h2 className='mt-1 text-primary text-2xl font-bold'>
-            {formData.appointmentId}
+            {formData.f_appidno}
           </h2>
         </header>
 
@@ -200,9 +267,12 @@ const AppointmentNew = () => {
                   </label>
                   <input
                     type='text'
-                    value={formData.creator}
+                    value={formData.f_appcreatebyname}
                     onChange={e =>
-                      setFormData({ ...formData, creator: e.target.value })
+                      setFormData({
+                        ...formData,
+                        f_appcreatebyname: e.target.value
+                      })
                     }
                     className='input input-bordered h-13 rounded-3xl'
                   />
@@ -213,7 +283,13 @@ const AppointmentNew = () => {
                   </label>
                   <input
                     type='text'
-                    value={formData.patientInfo}
+                    value={formData.f_appcreateforname}
+                    onChange={e =>
+                      setFormData({
+                        ...formData,
+                        f_appcreateforname: e.target.value
+                      })
+                    }
                     className='input input-bordered h-13 rounded-3xl'
                   />
                 </div>
@@ -233,7 +309,7 @@ const AppointmentNew = () => {
                   <input
                     type='date'
                     ref={hiddenDateInputRef}
-                    value={dateValue}
+                    value={formData.f_appdoctorduedate}
                     onChange={handleDateChange}
                     className='hidden'
                   />
@@ -244,8 +320,8 @@ const AppointmentNew = () => {
                   </label>
                   <input
                     type='tel'
-                    name='phone1'
-                    value={formData.phone1}
+                    name='f_appcreatecontacttelephone'
+                    value={formData.f_appcreatecontacttelephone}
                     onChange={handleInputChange}
                     className='input input-bordered h-13 rounded-3xl'
                   />
@@ -256,8 +332,8 @@ const AppointmentNew = () => {
                   </label>
                   <input
                     type='tel'
-                    name='phone2'
-                    value={formData.phone2}
+                    name='f_appcreatecontacttelephonetwo'
+                    value={formData.f_appcreatecontacttelephonetwo}
                     onChange={handleInputChange}
                     className='input input-bordered h-13 rounded-3xl'
                   />
@@ -267,8 +343,8 @@ const AppointmentNew = () => {
                     <span className='label-text'>สถานที่รับบริการ</span>
                   </label>
                   <textarea
-                    name='serviceLocation'
-                    value={formData.serviceLocation}
+                    name='f_appcreatecontactaddress'
+                    value={formData.f_appcreatecontactaddress}
                     onChange={handleInputChange}
                     className='textarea textarea-bordered h-24 rounded-3xl'
                   ></textarea>
@@ -307,7 +383,7 @@ const AppointmentNew = () => {
                           className='btn bg-black/15 btn-circle btn-sm border-0 absolute top-3 right-3'
                           aria-label='Remove image'
                         >
-                          <IoIosClose size={20} />
+                          <IoIosClose size={24} />
                         </button>
                       </div>
                     ) : (
@@ -320,7 +396,7 @@ const AppointmentNew = () => {
                           className='text-base-content/50 mb-2'
                         />
                         <span className='text-sm text-base-content/70'>
-                          คลิกเพื่ออัปโหลดรูปภาพ
+                          แตะเพื่ออัปโหลดรูปภาพ
                         </span>
                       </label>
                     )}
@@ -328,11 +404,15 @@ const AppointmentNew = () => {
                 </div>
                 <div>
                   <div className='w-full h-52 bg-base-200 rounded-3xl flex items-center justify-center text-base-content/50 overflow-hidden'>
-                    <LocationMap lat={formData.lat} lon={formData.lon} />
+                    <LocationMap
+                      lat={parseFloat(formData.f_appcreatecontactlat)}
+                      lon={parseFloat(formData.f_appcreatecontactlon)}
+                    />
                   </div>
                   <p className='text-xs text-center mt-2 text-base-content/70'>
-                    LAT: {formData.lat.toFixed(5)}, LON:{' '}
-                    {formData.lon.toFixed(5)}
+                    LAT: {parseFloat(formData.f_appcreatecontactlat).toFixed(5)}
+                    , LON:{' '}
+                    {parseFloat(formData.f_appcreatecontactlon).toFixed(5)}
                   </p>
                 </div>
               </div>
