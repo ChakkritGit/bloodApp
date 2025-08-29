@@ -3,9 +3,8 @@ import { useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
 import { HiPhoto } from 'react-icons/hi2'
-import { BiArrowBack } from 'react-icons/bi'
 import { useTranslation } from 'react-i18next'
-import { IoIosClose } from 'react-icons/io'
+import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
 import LocationMap from '../../utils/LocationMap'
 
 const AppointmentNew = () => {
@@ -14,14 +13,14 @@ const AppointmentNew = () => {
 
   const initialFormData = {
     appointmentId: id,
-    status: 'รอเข้ารับบริการ',
-    confirmer: 'คุณสมชาย ใจดี',
-    creator: 'คุณสมหญิง สบายใจ',
-    patientInfo: '???????? HN',
-    doctorDueDate: '2025-08-25',
-    phone1: '089-777-0817',
-    phone2: '089-777-0817',
-    serviceLocation: '???????????????????????????',
+    status: '',
+    confirmer: '',
+    creator: '',
+    patientInfo: '',
+    doctorDueDate: '',
+    phone1: '',
+    phone2: '',
+    serviceLocation: '',
     lat: 13.839735640059327,
     lon: 100.55967513430038
   }
@@ -92,16 +91,18 @@ const AppointmentNew = () => {
   return (
     <div className='min-h-screen bg-base-200 p-4'>
       <button
-        className='btn text-primary px-2 h-10 rounded-3xl'
+        className='btn text-primary pr-2 pl-0 h-10 rounded-3xl'
         onClick={() => window.history.back()}
       >
-        <BiArrowBack size={24} />
+        <IoIosArrowBack size={24} />
         <span>{t('back')}</span>
       </button>
       <div className='max-w-4xl mx-auto mt-5'>
         <header className='text-center mb-8'>
-          <h1 className='text-3xl font-bold'>รายละเอียดใบนัดหมาย</h1>
-          <p className='text-base-content/70 font-medium mt-3'>เลขที่ใบนัด</p>
+          <h1 className='text-3xl font-bold'>{t('appointmentAddHeadTitle')}</h1>
+          <p className='text-base-content/70 font-medium mt-3'>
+            {t('appointmentNumber')}
+          </p>
           <h2 className='mt-1 text-primary text-2xl font-bold'>
             {formData.appointmentId}
           </h2>
@@ -111,24 +112,32 @@ const AppointmentNew = () => {
           <div className='card-body gap-6'>
             <section>
               <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
-                ข้อมูลสถานะ
+                {t('detailStatus')}
               </h3>
               <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
                 <div>
                   <div className='text-sm text-base-content/70'>
-                    สถานะล่าสุด
+                    {t('lastStatus')}
                   </div>
-                  <div className='font-medium'>{formData.status}</div>
+                  <div className='font-medium text-primary'>
+                    <IoIosRemove size={24} />
+                  </div>
                 </div>
                 <div>
                   <div className='text-sm text-base-content/70'>
-                    ผู้ยืนยันนัด
+                    {t('confirmedBy')}
                   </div>
-                  <div className='font-medium'>{formData.confirmer}</div>
+                  <div className='font-medium text-primary'>
+                    <IoIosRemove size={24} />
+                  </div>
                 </div>
                 <div>
-                  <div className='text-sm text-base-content/70'>ผู้ทำนัด</div>
-                  <div className='font-medium'>{formData.creator}</div>
+                  <div className='text-sm text-base-content/70'>
+                    {t('queueNumber')}
+                  </div>
+                  <div className='font-medium text-primary'>
+                    <IoIosRemove size={24} />
+                  </div>
                 </div>
               </div>
             </section>
@@ -140,13 +149,25 @@ const AppointmentNew = () => {
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div className='form-control'>
                   <label className='label'>
+                    <span className='label-text'>ผู้ทำนัด</span>
+                  </label>
+                  <input
+                    type='text'
+                    value={formData.creator}
+                    onChange={e =>
+                      setFormData({ ...formData, creator: e.target.value })
+                    }
+                    className='input input-bordered h-13 rounded-3xl'
+                  />
+                </div>
+                <div className='form-control'>
+                  <label className='label'>
                     <span className='label-text'>ผู้ป่วย</span>
                   </label>
                   <input
                     type='text'
                     value={formData.patientInfo}
                     className='input input-bordered h-13 rounded-3xl'
-                    disabled
                   />
                 </div>
                 <div className='form-control'>
@@ -269,7 +290,10 @@ const AppointmentNew = () => {
                 </div>
               </div>
               <div className='form-control mt-4'>
-                <label className='label cursor-pointer justify-start gap-4' htmlFor='termsAndConditions'>
+                <label
+                  className='label cursor-pointer justify-start gap-4'
+                  htmlFor='termsAndConditions'
+                >
                   <input
                     type='checkbox'
                     id='termsAndConditions'

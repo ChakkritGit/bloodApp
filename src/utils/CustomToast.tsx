@@ -1,7 +1,7 @@
 import { toast } from 'react-hot-toast'
 import { HiXMark } from 'react-icons/hi2'
-import { ToastComponentType } from '../redux/types/toast.type'
 import MarqueeText from './MarqueeText'
+import { ToastComponentType } from '../types/toast.type'
 
 const CustomToast = ({
   t,
@@ -55,9 +55,9 @@ const CustomToast = ({
             />
           </div>
         </div>
-        <div className='flex-1 mx-4'>
-          <p className='text-lg font-medium text-base-content max-w-[350px] truncate'>
-            <MarqueeText speed={100} className='text-lg font-medium pr-25'>
+        <div className='flex-1 mx-4 max-w-[200px] overflow-hidden'>
+          <p className='text-lg font-medium text-base-content truncate'>
+            <MarqueeText speed={100} className='text-lg font-medium'>
               {message}
             </MarqueeText>
           </p>

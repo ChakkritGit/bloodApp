@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast'
 import CustomToast from './CustomToast'
-import { ToastType } from '../redux/types/toast.type'
+import { ToastType } from '../types/toast.type'
 
 const showToast = ({
   type,

@@ -6,7 +6,7 @@ import { IoIosClose } from 'react-icons/io'
 import { showToast } from '../../utils/toast'
 import { BiError, BiErrorCircle } from 'react-icons/bi'
 import axios, { AxiosError } from 'axios'
-import { ApiResponse } from '../../redux/types/api.response.type'
+import { ApiResponse } from '../../types/api.response.type'
 
 const Main = () => {
   const { t } = useTranslation()
@@ -22,7 +22,7 @@ const Main = () => {
         icon: BiErrorCircle,
         message: t('pleaseInputMoreThanTen'),
         duration: t('pleaseInputMoreThanTen').length > 27 ? 10000 : 1800,
-        showClose: false
+        showClose: true
       })
 
       return
@@ -58,7 +58,7 @@ const Main = () => {
 
   return (
     <div className='min-h-screen bg-base-200 h-dvh'>
-      <header className='fixed w-full bg-base-100 p-4 mx-auto shadow-sm border-b border-base-content/30'>
+      <header className='fixed w-full bg-base-100 p-4 mx-auto shadow-sm border-b border-base-content/30 z-10'>
         <div className='flex justify-center items-center text-base-content/70'>
           <h1 className='text-xl font-bold text-center text-base-content truncate'>
             {t('appName')}

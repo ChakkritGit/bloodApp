@@ -1,6 +1,6 @@
 import { cookieOptions, cookies } from '../../constants/utils/utilsConstants'
 import { CookieDecode } from '../../pages/types/cookie.type'
-import { TokenDecode } from '../types/token.type'
+import { TokenDecode } from '../../types/token.type'
 import {
   COOKIE_ENCODE,
   COOKIE_DECODE,
