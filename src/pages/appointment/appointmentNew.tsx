@@ -371,6 +371,39 @@ const AppointmentNew = () => {
             </div>
           </div>
         </div>
+
+        {/* <div className='form-control mt-8'>
+          <label
+            className='label cursor-pointer justify-start gap-4'
+            htmlFor='termsAndConditions'
+          >
+            <input
+              type='checkbox'
+              id='termsAndConditions'
+              checked={consent}
+              onChange={() => setConsent(!consent)}
+              className='checkbox'
+            />
+            <span className='label-text'>
+              ยินยอมให้โรงพยาบาลใช้งานข้อมูลส่วนบุคคลนี้
+            </span>
+          </label>
+        </div>
+
+        <div className='card-actions flex-col justify-between  mt-4'>
+          <button
+            disabled={!consent}
+            className='btn btn-primary w-full h-13 rounded-3xl text-lg font-bold'
+          >
+            บันทึกข้อมูล
+          </button>
+          <button
+            className='btn w-full h-13 rounded-3xl text-lg font-bold'
+            onClick={() => navigate('/', { replace: true })}
+          >
+            ยกเลิก
+          </button>
+        </div> */}
       </div>
     </div>
   )
