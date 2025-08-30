@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
-import { HiPhoto } from 'react-icons/hi2'
+import { HiMapPin, HiPhoto } from 'react-icons/hi2'
 import { useTranslation } from 'react-i18next'
 import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
 import LocationMap from '../../utils/LocationMap'
@@ -138,7 +138,7 @@ const AppointmentNew = () => {
     }
   }
 
-  useEffect(() => {
+  const getGeolocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         position => {
@@ -150,10 +150,17 @@ const AppointmentNew = () => {
         },
         error => {
           console.error('Error getting location:', error)
+          showToast({
+            type: 'error',
+            icon: BiError,
+            message: 'ไม่สามารถดึงพิกัดได้',
+            duration: 2000,
+            showClose: false
+          })
         }
       )
     }
-  }, [])
+  }
 
   useEffect(() => {
     if (!selectedFile) {
@@ -188,7 +195,7 @@ const AppointmentNew = () => {
   return (
     <div className='min-h-screen bg-base-200 p-4'>
       <button
-        className={`btn btn-ghost text-primary active:text-primary/50 pr-2 pl-0 h-10 rounded-3xl transition-all ${
+        className={`btn btn-ghost text-primary active:text-primary/50 pr-2 pl-0 h-10 select-none rounded-3xl transition-all ${
           isButtonFixed ? 'invisible' : 'visible'
         }`}
         onClick={() => navigate('/', { replace: true })}
@@ -197,7 +204,7 @@ const AppointmentNew = () => {
         <span>{t('back')}</span>
       </button>
       <div
-        className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-200/30 backdrop-blur-lg shadow-md z-50 transition-all duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-100/70 backdrop-blur-xl shadow-md hadow-md z-50 select-none transition-all duration-300 ease-in-out ${
           isButtonFixed
             ? 'translate-y-0 opacity-100'
             : '-translate-y-full opacity-0'
@@ -235,11 +242,13 @@ const AppointmentNew = () => {
         </div>
       </div>
       <div className='max-w-4xl mx-auto pt-8'>
-        <header className={`text-center transition-all duration-300 ease-in-out ${isButtonFixed ? 'opacity-0' : 'opacity-100'}`}>
+        <header
+          className={`text-center transition-all duration-300 ease-in-out ${
+            isButtonFixed ? 'opacity-0' : 'opacity-100'
+          }`}
+        >
           <h1 className='text-3xl font-bold'>{t('appointmentAddHeadTitle')}</h1>
-          <p className='text-base-content/70 font-medium mt-3'>
-            {t('appointmentNumber')}
-          </p>
+          <p className='label font-medium mt-3'>{t('appointmentNumber')}</p>
           <h2
             ref={paragraphRef}
             className='mt-1 text-primary text-2xl font-bold'
@@ -248,7 +257,11 @@ const AppointmentNew = () => {
           </h2>
         </header>
 
-        <div className={`card w-full bg-base-100 shadow-xl rounded-[48px] transition-all duration-300 ease-in-out ${isButtonFixed ? 'mt-20' : 'mt-8'}`}>
+        <div
+          className={`card w-full bg-base-100 shadow-xl rounded-[48px] transition-all duration-300 ease-in-out ${
+            isButtonFixed ? 'mt-20' : 'mt-8'
+          }`}
+        >
           <div className='card-body gap-6'>
             <section>
               <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
@@ -256,27 +269,21 @@ const AppointmentNew = () => {
               </h3>
               <div className='grid grid-cols-1 gap-4'>
                 <div>
-                  <div className='text-sm text-base-content/70'>
-                    {t('lastStatus')}
-                  </div>
+                  <div className='label'>{t('lastStatus')}</div>
                   <div className='font-medium text-primary'>
-                    <IoIosRemove size={24} />
+                    <IoIosRemove size={32} />
                   </div>
                 </div>
                 <div>
-                  <div className='text-sm text-base-content/70'>
-                    {t('confirmedBy')}
-                  </div>
+                  <div className='label'>{t('confirmedBy')}</div>
                   <div className='font-medium text-primary'>
-                    <IoIosRemove size={24} />
+                    <IoIosRemove size={32} />
                   </div>
                 </div>
                 <div>
-                  <div className='text-sm text-base-content/70'>
-                    {t('queueNumber')}
-                  </div>
+                  <div className='label'>{t('queueNumber')}</div>
                   <div className='font-medium text-primary'>
-                    <IoIosRemove size={24} />
+                    <IoIosRemove size={32} />
                   </div>
                 </div>
               </div>
@@ -289,7 +296,7 @@ const AppointmentNew = () => {
               <div className='grid grid-cols-1 gap-4'>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label-text'>ผู้ทำนัด</span>
+                    <span className='label'>ผู้ทำนัด</span>
                   </label>
                   <input
                     type='text'
@@ -305,7 +312,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label-text'>ผู้ป่วย</span>
+                    <span className='label'>ผู้ป่วย</span>
                   </label>
                   <input
                     type='text'
@@ -321,7 +328,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label-text'>กำหนดพบแพทย์</span>
+                    <span className='label'>กำหนดพบแพทย์</span>
                   </label>
                   <input
                     type='text'
@@ -342,7 +349,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label-text'>เบอร์โทรติดต่อ 1</span>
+                    <span className='label'>เบอร์โทรติดต่อ 1</span>
                   </label>
                   <input
                     type='tel'
@@ -354,7 +361,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label-text'>เบอร์โทรติดต่อ 2</span>
+                    <span className='label'>เบอร์โทรติดต่อ 2</span>
                   </label>
                   <input
                     type='tel'
@@ -366,7 +373,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label-text'>สถานที่รับบริการ</span>
+                    <span className='label'>สถานที่รับบริการ</span>
                   </label>
                   <textarea
                     name='f_appcreatecontactaddress'
@@ -385,7 +392,7 @@ const AppointmentNew = () => {
               <div className='grid grid-cols-1 gap-6 items-start'>
                 <div className='form-control w-full'>
                   <label className='label'>
-                    <span className='label-text'>ภาพใบนัด</span>
+                    <span className='label'>ภาพใบนัด</span>
                   </label>
                   <div className='w-full h-52 md:h-84 rounded-3xl relative'>
                     <input
@@ -406,7 +413,7 @@ const AppointmentNew = () => {
                         />
                         <button
                           onClick={handleRemoveImage}
-                          className='btn bg-black/15 btn-circle btn-sm border-0 absolute top-3 right-3'
+                          className='btn bg-black/30 text-base-100 btn-circle btn-sm border-0 shadow-none absolute top-3 right-3'
                           aria-label='Remove image'
                         >
                           <IoIosClose size={24} />
@@ -429,20 +436,45 @@ const AppointmentNew = () => {
                   </div>
                 </div>
                 <div className='w-full h-52 md:h-84'>
-                  <div className='w-full h-52 md:h-full bg-base-200 rounded-3xl flex items-center justify-center text-base-content/50 overflow-hidden'>
-                    <LocationMap
-                      lat={parseFloat(formData.f_appcreatecontactlat)}
-                      lon={parseFloat(formData.f_appcreatecontactlon)}
-                    />
+                  <div
+                    className='w-full h-52 md:h-full bg-base-200 rounded-3xl flex items-center justify-center text-base-content/50 overflow-hidden cursor-pointer'
+                    onClick={getGeolocation}
+                  >
+                    {formData.f_appcreatecontactlat &&
+                    formData.f_appcreatecontactlon ? (
+                      <LocationMap
+                        lat={parseFloat(formData.f_appcreatecontactlat)}
+                        lon={parseFloat(formData.f_appcreatecontactlon)}
+                      />
+                    ) : (
+                      <div className='w-full h-full md:h-full border-2 border-dashed rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
+                        <HiMapPin
+                          size={40}
+                          className='text-base-content/50 mb-2'
+                        />
+                        <span className='text-sm text-base-content/70'>
+                          แตะที่นี่เพื่อดึงพิกัด
+                        </span>
+                      </div>
+                    )}
                   </div>
+
                   <p className='text-xs text-center mt-2 text-base-content/70'>
-                    LAT: {parseFloat(formData.f_appcreatecontactlat).toFixed(5)}
-                    , LON:{' '}
-                    {parseFloat(formData.f_appcreatecontactlon).toFixed(5)}
+                    {formData.f_appcreatecontactlat &&
+                    formData.f_appcreatecontactlon ? (
+                      <>
+                        LAT:{' '}
+                        {parseFloat(formData.f_appcreatecontactlat).toFixed(5)},
+                        LON:{' '}
+                        {parseFloat(formData.f_appcreatecontactlon).toFixed(5)}
+                      </>
+                    ) : (
+                      'ยังไม่มีพิกัด'
+                    )}
                   </p>
                 </div>
               </div>
-              <div className='form-control mt-4'>
+              <div className='form-control mt-10'>
                 <label
                   className='label cursor-pointer justify-start gap-4'
                   htmlFor='termsAndConditions'
@@ -454,14 +486,14 @@ const AppointmentNew = () => {
                     onChange={() => setConsent(!consent)}
                     className='checkbox'
                   />
-                  <span className='label-text'>
+                  <span className='label'>
                     ยินยอมให้โรงพยาบาลใช้งานข้อมูลส่วนบุคคลนี้
                   </span>
                 </label>
               </div>
             </section>
 
-            <div className='card-actions flex-col justify-between border-t pt-6 mt-4'>
+            <div className='card-actions flex-col justify-between border-t pt-6'>
               <button
                 disabled={!consent}
                 className='btn btn-primary w-full h-13 rounded-3xl text-lg font-bold'
@@ -491,7 +523,7 @@ const AppointmentNew = () => {
               onChange={() => setConsent(!consent)}
               className='checkbox'
             />
-            <span className='label-text'>
+            <span className='label'>
               ยินยอมให้โรงพยาบาลใช้งานข้อมูลส่วนบุคคลนี้
             </span>
           </label>
