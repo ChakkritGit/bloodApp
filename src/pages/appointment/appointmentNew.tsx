@@ -387,7 +387,7 @@ const AppointmentNew = () => {
                   <label className='label'>
                     <span className='label-text'>ภาพใบนัด</span>
                   </label>
-                  <div className='w-full h-52 rounded-3xl relative'>
+                  <div className='w-full h-52 md:h-84 rounded-3xl relative'>
                     <input
                       type='file'
                       accept='image/*'
@@ -415,7 +415,7 @@ const AppointmentNew = () => {
                     ) : (
                       <label
                         htmlFor='imageUploader'
-                        className='w-full h-full border-2 border-dashed rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'
+                        className='w-full h-full md:h-full border-2 border-dashed rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'
                       >
                         <HiPhoto
                           size={40}
@@ -428,8 +428,8 @@ const AppointmentNew = () => {
                     )}
                   </div>
                 </div>
-                <div>
-                  <div className='w-full h-52 bg-base-200 rounded-3xl flex items-center justify-center text-base-content/50 overflow-hidden'>
+                <div className='w-full h-52 md:h-84'>
+                  <div className='w-full h-52 md:h-full bg-base-200 rounded-3xl flex items-center justify-center text-base-content/50 overflow-hidden'>
                     <LocationMap
                       lat={parseFloat(formData.f_appcreatecontactlat)}
                       lon={parseFloat(formData.f_appcreatecontactlon)}
