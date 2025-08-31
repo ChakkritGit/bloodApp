@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import axios, { AxiosError } from 'axios'
 import { showToast } from '../../utils/toast'
-import { BiCheck, BiError } from 'react-icons/bi'
+import { BiError } from 'react-icons/bi'
 import { ApiResponse } from '../../types/api.response.type'
 import { LoginResponse } from '../../types/login.type'
 import {
@@ -35,13 +35,6 @@ const Login = () => {
         `${import.meta.env.VITE_APP_API}/auth/login`,
         userForm
       )
-      showToast({
-        type: 'success',
-        icon: BiCheck,
-        message: result.data.message,
-        duration: 3000,
-        showClose: false
-      })
       const { f_id, f_userfullname, f_userstatus, token } = result.data.data
 
       const tokenObject = {

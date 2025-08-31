@@ -49,6 +49,11 @@ export default {
     signIn: 'เข้าสู่ระบบ',
     manageAppointment: 'จัดการการนัดหมาย',
     manageUser: 'จัดการผู้ใช้',
-    manageSetting: 'การตั้งค่า'
+    manageSetting: 'การตั้งค่า',
+    signOut: 'ออกจากระบบ',
+    closeButton: 'ยกเลิก',
+    confirmButton: 'ยืนยัน',
+    logOutTitle: 'ออกจากระบบ',
+    logOutDescription: 'คุณต้องการออกจากระบบหรือไม่?'
   }
 }

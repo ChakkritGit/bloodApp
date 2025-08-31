@@ -49,6 +49,11 @@ export default {
     signIn: 'Sign in',
     manageAppointment: 'Manage Appointments',
     manageUser: 'Manage Users',
-    manageSetting: 'Settings'
+    manageSetting: 'Settings',
+    signOut: 'Sign out',
+    closeButton: 'Cancel',
+    confirmButton: 'Confirm',
+    logOutTitle: 'Sign out',
+    logOutDescription: 'Are you sure you want to sign out?'
   }
 }

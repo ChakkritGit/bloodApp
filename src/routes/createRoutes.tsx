@@ -7,6 +7,9 @@ import Main from '../pages/main/main'
 import AppointmentNew from '../pages/appointment/appointmentNew'
 import AppointmentSearch from '../pages/appointment/appointmentSearch'
 import Layout from '../pages/layout/layout'
+import Home from '../pages/home/home'
+import User from '../pages/user/user'
+import Setting from '../pages/setting/setting'
 
 const router = () =>
   createBrowserRouter([
@@ -36,17 +39,17 @@ const router = () =>
           children: [
             {
               index: true,
-              element: <div>Home</div>,
+              element: <Home />,
               errorElement: <ErrorPage />
             },
             {
               path: '/appointment/user',
-              element: <div>User</div>,
+              element:  <User />,
               errorElement: <ErrorPage />
             },
             {
               path: '/appointment/setting',
-              element: <div>Setting</div>,
+              element: <Setting />,
               errorElement: <ErrorPage />
             },
           ]
