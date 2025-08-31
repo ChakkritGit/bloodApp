@@ -5,11 +5,12 @@ import { th } from 'date-fns/locale'
 import { HiMapPin, HiPhoto } from 'react-icons/hi2'
 import { useTranslation } from 'react-i18next'
 import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
-import axios, { AxiosError } from 'axios'
 import { showToast } from '../../utils/toast'
 import { BiCheck, BiError } from 'react-icons/bi'
-import { Appointment } from '../../types/appointment.type'
+import { AppointmentState } from '../../types/appointment.type'
 import { resizeImage } from '../../constants/utils/image'
+import { ApiResponse } from '../../types/api.response.type'
+import axios, { AxiosError } from 'axios'
 import LocationMap from '../../utils/LocationMap'
 
 const AppointmentNew = () => {
@@ -17,7 +18,7 @@ const AppointmentNew = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const [isButtonFixed, setIsButtonFixed] = useState(false)
-  const [appointmentData, setAppointmentData] = useState<Appointment>({
+  const [appointmentData, setAppointmentData] = useState<AppointmentState>({
     f_appidno: id,
     f_appcreatebyname: '',
     f_appcreateforhn: '',
@@ -78,7 +79,7 @@ const AppointmentNew = () => {
     )
     formData.append('appointmentDoc', appointmentData.selectedFile as File)
     try {
-      const result = await axios.post(
+      const result = await axios.post<ApiResponse<string>>(
         `${import.meta.env.VITE_APP_API}/appointment`,
         formData,
         {
@@ -95,7 +96,9 @@ const AppointmentNew = () => {
         duration: 3000,
         showClose: false
       })
-      navigate(`/appointment/search/${appointmentData.f_appidno}`, { replace: true })
+      navigate(`/appointment/search/${appointmentData.f_appidno}`, {
+        replace: true
+      })
     } catch (error) {
       if (error instanceof AxiosError) {
         showToast({
@@ -122,7 +125,7 @@ const AppointmentNew = () => {
     ? format(new Date(appointmentData.f_appdoctorduedate), 'd MMMM yyyy', {
         locale: th
       })
-    : 'กรุณาเลือกวันที่'
+    : t('selectDate')
 
   const handleDateChange = (e: any) => {
     setAppointmentData({
@@ -233,7 +236,7 @@ const AppointmentNew = () => {
         <span>{t('back')}</span>
       </button>
       <div
-        className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-100/70 backdrop-blur-xl shadow-md z-50 select-none transition-all duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-100/60 backdrop-blur-xl shadow-md z-50 select-none transition-all duration-300 ease-in-out ${
           isButtonFixed
             ? 'translate-y-0 opacity-100'
             : '-translate-y-full opacity-0'
@@ -320,12 +323,12 @@ const AppointmentNew = () => {
 
             <section>
               <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
-                ข้อมูลผู้ป่วยและการนัดหมาย
+                {t('patientAppointmentInfo')}
               </h3>
               <div className='grid grid-cols-1 gap-4'>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label'>ผู้ทำนัด</span>
+                    <span className='label'>{t('appointmentCreator')}</span>
                   </label>
                   <input
                     type='text'
@@ -341,7 +344,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label'>ผู้ป่วย</span>
+                    <span className='label'>{t('patient')}</span>
                   </label>
                   <input
                     type='text'
@@ -373,7 +376,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label'>กำหนดพบแพทย์</span>
+                    <span className='label'>{t('scheduledDoctorVisit')}</span>
                   </label>
                   <input
                     type='text'
@@ -394,7 +397,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label'>เบอร์โทรติดต่อ 1</span>
+                    <span className='label'>{t('contactNumber')} 1</span>
                   </label>
                   <input
                     type='tel'
@@ -406,7 +409,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label'>เบอร์โทรติดต่อ 2</span>
+                    <span className='label'>{t('contactNumber')} 2</span>
                   </label>
                   <input
                     type='tel'
@@ -418,7 +421,7 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label'>สถานที่รับบริการ</span>
+                    <span className='label'>{t('serviceLocation')}</span>
                   </label>
                   <textarea
                     name='f_appcreatecontactaddress'
@@ -432,14 +435,14 @@ const AppointmentNew = () => {
 
             <section>
               <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
-                แผนที่และไฟล์แนบ
+                {t('mapAndAttachments')}
               </h3>
               <div className='grid grid-cols-1 gap-6 items-start'>
                 <div className='form-control w-full'>
                   <label className='label'>
-                    <span className='label'>ภาพใบนัด</span>
+                    <span className='label'>{t('appointmentSlipImage')}</span>
                   </label>
-                  <div className='w-full h-52 md:h-84 rounded-3xl relative'>
+                  <div className='w-full h-52 md:h-84 rounded-3xl mt-3 relative'>
                     <input
                       type='file'
                       accept='image/*'
@@ -474,7 +477,7 @@ const AppointmentNew = () => {
                           className='text-base-content/50 mb-2'
                         />
                         <span className='text-sm text-base-content/70'>
-                          แตะเพื่ออัปโหลดรูปภาพ
+                          {t('uploadImage')}
                         </span>
                       </label>
                     ) : (
@@ -502,30 +505,29 @@ const AppointmentNew = () => {
                           className='text-base-content/50 mb-2'
                         />
                         <span className='text-sm text-base-content/70'>
-                          แตะที่นี่เพื่อดึงพิกัด
+                          {t('getLocation')}
                         </span>
                       </div>
                     )}
                   </div>
-
-                  <p className='text-xs text-center mt-2 text-base-content/70'>
-                    {appointmentData.f_appcreatecontactlat &&
-                    appointmentData.f_appcreatecontactlon ? (
-                      <>
-                        LAT:{' '}
-                        {parseFloat(
-                          appointmentData.f_appcreatecontactlat
-                        ).toFixed(5)}
-                        , LON:{' '}
-                        {parseFloat(
-                          appointmentData.f_appcreatecontactlon
-                        ).toFixed(5)}
-                      </>
-                    ) : (
-                      'ยังไม่มีพิกัด'
-                    )}
-                  </p>
                 </div>
+                <p className='text-xs text-center mt-2 text-base-content/70'>
+                  {appointmentData.f_appcreatecontactlat &&
+                  appointmentData.f_appcreatecontactlon ? (
+                    <>
+                      LAT:{' '}
+                      {parseFloat(
+                        appointmentData.f_appcreatecontactlat
+                      ).toFixed(5)}
+                      , LON:{' '}
+                      {parseFloat(
+                        appointmentData.f_appcreatecontactlon
+                      ).toFixed(5)}
+                    </>
+                  ) : (
+                    t('noLocation')
+                  )}
+                </p>
               </div>
               <div className='form-control mt-10'>
                 <label
@@ -537,10 +539,10 @@ const AppointmentNew = () => {
                     id='termsAndConditions'
                     checked={consent}
                     onChange={() => setConsent(!consent)}
-                    className='checkbox'
+                    className='checkbox checkbox-primary'
                   />
-                  <span className='label'>
-                    ยินยอมให้โรงพยาบาลใช้งานข้อมูลส่วนบุคคลนี้
+                  <span className='label max-w-58 text-wrap'>
+                    {t('consent')}
                   </span>
                 </label>
               </div>
@@ -552,50 +554,17 @@ const AppointmentNew = () => {
                 className='btn btn-primary w-full h-13 rounded-3xl text-lg font-bold'
                 onClick={handleSubmit}
               >
-                บันทึกข้อมูล
+                {t('saveButton')}
               </button>
               <button
                 className='btn w-full h-13 rounded-3xl text-lg font-bold'
                 onClick={() => navigate('/', { replace: true })}
               >
-                ยกเลิก
+                {t('cancelButton')}
               </button>
             </div>
           </div>
         </div>
-
-        {/* <div className='form-control mt-8'>
-          <label
-            className='label cursor-pointer justify-start gap-4'
-            htmlFor='termsAndConditions'
-          >
-            <input
-              type='checkbox'
-              id='termsAndConditions'
-              checked={consent}
-              onChange={() => setConsent(!consent)}
-              className='checkbox'
-            />
-            <span className='label'>
-              ยินยอมให้โรงพยาบาลใช้งานข้อมูลส่วนบุคคลนี้
-            </span>
-          </label>
-        </div>
-
-        <div className='card-actions flex-col justify-between  mt-4'>
-          <button
-            disabled={!consent}
-            className='btn btn-primary w-full h-13 rounded-3xl text-lg font-bold'
-          >
-            บันทึกข้อมูล
-          </button>
-          <button
-            className='btn w-full h-13 rounded-3xl text-lg font-bold'
-            onClick={() => navigate('/', { replace: true })}
-          >
-            ยกเลิก
-          </button>
-        </div> */}
       </div>
     </div>
   )

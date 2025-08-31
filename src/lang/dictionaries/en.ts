@@ -17,6 +17,21 @@ export default {
     detailStatus: 'Details status',
     lastStatus: 'Latest status',
     confirmedBy: 'Confirmed by',
-    queueNumber: 'Queue number'
+    queueNumber: 'Queue number',
+    selectDate: 'Please select date',
+    patientAppointmentInfo: 'Patient and Appointment Information',
+    saveButton: 'Save',
+    cancelButton: 'Cancel',
+    appointmentCreator: 'Appointment Creator',
+    patient: 'Patient',
+    scheduledDoctorVisit: 'Scheduled Doctor Visit',
+    contactNumber: 'Contact Number',
+    serviceLocation: 'Service Location',
+    mapAndAttachments: 'Map and Attachments',
+    appointmentSlipImage: 'Appointment Slip Image',
+    uploadImage: 'Tap to Upload Image',
+    getLocation: 'Tap Here to Get Location',
+    noLocation: 'No Location Available',
+    consent: 'I consent to the hospital using this personal data'
   }
 }

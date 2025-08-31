@@ -30,7 +30,7 @@ const Main = () => {
 
     setIsLoading(true)
     try {
-      const result = await axios.get<ApiResponse<any>>(
+      const result = await axios.get<ApiResponse<string>>(
         `${import.meta.env.VITE_APP_API}/appointment/${appointmentId}`
       )
 
