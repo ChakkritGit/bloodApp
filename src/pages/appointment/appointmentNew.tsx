@@ -294,7 +294,7 @@ const AppointmentNew = () => {
             isButtonFixed ? 'mt-20' : 'mt-8'
           }`}
         >
-          <div className='card-body gap-6'>
+          <div className='card-body gap-4'>
             <section>
               <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
                 {t('detailStatus')}
@@ -302,19 +302,19 @@ const AppointmentNew = () => {
               <div className='grid grid-cols-1 gap-4'>
                 <div>
                   <div className='label'>{t('lastStatus')}</div>
-                  <div className='font-medium text-primary'>
+                  <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
                     <IoIosRemove size={32} />
                   </div>
                 </div>
                 <div>
                   <div className='label'>{t('confirmedBy')}</div>
-                  <div className='font-medium text-primary'>
+                  <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
                     <IoIosRemove size={32} />
                   </div>
                 </div>
                 <div>
                   <div className='label'>{t('queueNumber')}</div>
-                  <div className='font-medium text-primary'>
+                  <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
                     <IoIosRemove size={32} />
                   </div>
                 </div>

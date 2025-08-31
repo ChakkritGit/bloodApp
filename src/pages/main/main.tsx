@@ -7,6 +7,7 @@ import { showToast } from '../../utils/toast'
 import { BiError, BiErrorCircle } from 'react-icons/bi'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '../../types/api.response.type'
+import { Appointment } from '../../types/appointment.type'
 
 const Main = () => {
   const { t } = useTranslation()
@@ -30,8 +31,8 @@ const Main = () => {
 
     setIsLoading(true)
     try {
-      const result = await axios.get<ApiResponse<string>>(
-        `${import.meta.env.VITE_APP_API}/appointment/${appointmentId}`
+      const result = await axios.get<ApiResponse<Appointment>>(
+        `${import.meta.env.VITE_APP_API}/appointment/check/${appointmentId}`
       )
 
       if (result.data.data) {
@@ -58,7 +59,7 @@ const Main = () => {
 
   return (
     <div className='min-h-screen bg-base-200 h-dvh'>
-      <header className='fixed w-full bg-base-100 p-4 mx-auto shadow-sm border-b border-base-content/30 z-10'>
+      <header className='fixed w-full bg-base-100 px-4 py-5 mx-auto shadow-sm border-b border-base-content/30 rounded-b-3xl z-10'>
         <div className='flex justify-center items-center text-base-content/70'>
           <h1 className='text-xl font-bold text-center text-base-content truncate'>
             {t('appName')}

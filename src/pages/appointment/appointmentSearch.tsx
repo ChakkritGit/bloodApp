@@ -92,6 +92,23 @@ const AppointmentSearch = () => {
       })
     : t('selectDate')
 
+  const formattedThaiServiceDate = appointmentData.f_appadminduedate ? (
+    format(new Date(appointmentData.f_appadminduedate), 'd MMMM yyyy', {
+      locale: th
+    })
+  ) : (
+    <div className='font-medium text-primary'>
+      <IoIosRemove size={32} />
+    </div>
+  )
+
+  const statusMap: Record<number, string> = {
+    1: t('stepAppOne'),
+    2: t('stepAppTwo'),
+    3: t('stepAppThree'),
+    4: t('stepAppFour')
+  }
+
   const fetchAppointment = async () => {
     setIsLoading(true)
     try {
@@ -107,7 +124,7 @@ const AppointmentSearch = () => {
           icon: BiError,
           message: error.response?.data.message,
           duration: error.response?.data.message.length > 27 ? 10000 : 1800,
-          showClose: false
+          showClose: true
         })
       } else {
         console.error(error)
@@ -220,7 +237,7 @@ const AppointmentSearch = () => {
                 isButtonFixed ? 'mt-20' : 'mt-8'
               }`}
             >
-              <div className='card-body gap-6'>
+              <div className='card-body gap-4'>
                 <section>
                   <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
                     {t('detailStatus')}
@@ -228,20 +245,46 @@ const AppointmentSearch = () => {
                   <div className='grid grid-cols-1 gap-4'>
                     <div>
                       <div className='label'>{t('lastStatus')}</div>
-                      <div className='font-medium text-primary'>
-                        <IoIosRemove size={32} />
+                      <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
+                        {statusMap[appointmentData.f_appstepno] ??
+                          t('stepAppFri')}
                       </div>
                     </div>
                     <div>
                       <div className='label'>{t('confirmedBy')}</div>
-                      <div className='font-medium text-primary'>
-                        <IoIosRemove size={32} />
+                      <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
+                        {appointmentData.f_appcreateconfirmname ? (
+                          <div className='flex flex-col'>
+                            <span>
+                              {appointmentData.f_appcreateconfirmname}
+                            </span>
+                            <span className='text-sm'>
+                              {appointmentData.f_appcreateconfirmdatetime
+                                ? format(
+                                    new Date(
+                                      appointmentData.f_appcreateconfirmdatetime
+                                    ),
+                                    'd MMMM yyyy',
+                                    {
+                                      locale: th
+                                    }
+                                  )
+                                : '—'}
+                            </span>
+                          </div>
+                        ) : (
+                          <IoIosRemove size={32} />
+                        )}
                       </div>
                     </div>
                     <div>
                       <div className='label'>{t('queueNumber')}</div>
-                      <div className='font-medium text-primary'>
-                        <IoIosRemove size={32} />
+                      <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
+                        {appointmentData.f_appadminduequemax ? (
+                          `${appointmentData.f_appadminduequemax} / 30`
+                        ) : (
+                          <IoIosRemove size={32} />
+                        )}
                       </div>
                     </div>
                   </div>
@@ -284,6 +327,14 @@ const AppointmentSearch = () => {
                       </label>
                       <div className='inline-flex items-center font-medium text-base h-10 w-full'>
                         {formattedThaiDate}
+                      </div>
+                    </div>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>{t('serviceDate')}</span>
+                      </label>
+                      <div className='inline-flex items-center font-medium text-base h-10 w-full'>
+                        {formattedThaiServiceDate}
                       </div>
                     </div>
                     <div className='form-control'>
@@ -359,7 +410,7 @@ const AppointmentSearch = () => {
                       </div>
 
                       <label className='label mt-3'>
-                        <span className='label'>ภาพใบรายการ</span>
+                        <span className='label'>{t('testListImage')}</span>
                       </label>
 
                       <div className='w-full h-52 md:h-84 mt-3 relative'>
@@ -401,7 +452,7 @@ const AppointmentSearch = () => {
                       </div>
 
                       <label className='label mt-3'>
-                        <span className='label'>ภาพหลอดเลือด</span>
+                        <span className='label'>{t('bloodTubsImage')}</span>
                       </label>
 
                       <div className='w-full h-52 md:h-84 mt-3 relative'>
@@ -431,6 +482,44 @@ const AppointmentSearch = () => {
                                 </div>
                               )
                             )}
+                          </div>
+                        ) : (
+                          <label className='w-full h-full md:h-full rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
+                            <HiPhoto
+                              size={40}
+                              className='text-base-content/50 mb-2'
+                            />
+                          </label>
+                        )}
+                      </div>
+
+                      <label className='label'>
+                        <span className='label mt-3'>
+                          {t('paymentSlipImage')}
+                        </span>
+                      </label>
+
+                      <div className='w-full h-52 md:h-84 rounded-3xl mt-3 relative'>
+                        {appointmentData.files?.slip?.f_appimageidpart ? (
+                          <div
+                            className='w-full h-full cursor-pointer hover:opacity-90 transition-opacity duration-300 ease-in-out'
+                            onClick={() => {
+                              setOpnemImage(
+                                import.meta.env.VITE_APP_IMG +
+                                  appointmentData.files?.appointment
+                                    ?.f_appimageidpart
+                              )
+                              openImageRef.current?.showModal()
+                            }}
+                          >
+                            <img
+                              src={
+                                import.meta.env.VITE_APP_IMG +
+                                appointmentData.files.slip.f_appimageidpart
+                              }
+                              alt='Preview'
+                              className='w-full h-full object-cover rounded-3xl'
+                            />
                           </div>
                         ) : (
                           <label className='w-full h-full md:h-full rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>

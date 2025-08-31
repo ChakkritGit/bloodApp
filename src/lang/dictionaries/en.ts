@@ -32,6 +32,23 @@ export default {
     uploadImage: 'Tap to Upload Image',
     getLocation: 'Tap Here to Get Location',
     noLocation: 'No Location Available',
-    consent: 'I consent to the hospital using this personal data'
+    consent: 'I consent to the hospital using this personal data',
+    testListImage: 'Test List Image',
+    bloodTubsImage: 'Blood Tube Image',
+    paymentSlipImage: 'Payment Slip Image',
+    serviceDate: 'Service Date',
+    stepAppOne: 'Pending Review & Confirmation',
+    stepAppTwo: 'Confirmed with Appointment Date',
+    stepAppThree: 'Preparing Documents for Appointment',
+    stepAppFour: 'Check-up in Progress',
+    stepAppFri: 'Appointment Cancelled',
+    welcome: 'Welcome',
+    welcomeDescription: 'Staff Login',
+    username: 'Username',
+    password: 'Password',
+    signIn: 'Sign in',
+    manageAppointment: 'Manage Appointments',
+    manageUser: 'Manage Users',
+    manageSetting: 'Settings'
   }
 }

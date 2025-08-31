@@ -32,6 +32,23 @@ export default {
     uploadImage: 'แตะเพื่ออัปโหลดรูปภาพ',
     getLocation: 'แตะที่นี่เพื่อดึงพิกัด',
     noLocation: 'ยังไม่มีพิกัด',
-    consent: 'ยินยอมให้โรงพยาบาลใช้งานข้อมูลส่วนบุคคลนี้'
+    consent: 'ยินยอมให้โรงพยาบาลใช้งานข้อมูลส่วนบุคคลนี้',
+    testListImage: 'ภาพใบรายการ',
+    bloodTubsImage: 'ภาพหลอดเลือด',
+    paymentSlipImage: 'ภาพสลิป',
+    serviceDate: 'วันเข้าบริการ',
+    stepAppOne: 'รอพิจารณาและยืนยันรายการ',
+    stepAppTwo: 'ยืนยันรายการและวันนัดหมายแล้ว',
+    stepAppThree: 'เตรียมการและเอกสารเพื่อเข้าตรวจตามนัด',
+    stepAppFour: 'เข้าดำเนินการตรวจแล้ว',
+    stepAppFri: 'ยกเลิกการนัดหมาย',
+    welcome: 'ยินดีต้อนรับ',
+    welcomeDescription: 'พนักงาน เจ้าหน้าที่เข้าระบบใช้งาน',
+    username: 'ชื่อผู้ใช้',
+    password: 'รหัสผ่าน',
+    signIn: 'เข้าสู่ระบบ',
+    manageAppointment: 'จัดการการนัดหมาย',
+    manageUser: 'จัดการผู้ใช้',
+    manageSetting: 'การตั้งค่า'
   }
 }

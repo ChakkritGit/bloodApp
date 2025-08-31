@@ -6,6 +6,7 @@ import NotFound from './pages/notFound'
 import Main from '../pages/main/main'
 import AppointmentNew from '../pages/appointment/appointmentNew'
 import AppointmentSearch from '../pages/appointment/appointmentSearch'
+import Layout from '../pages/layout/layout'
 
 const router = () =>
   createBrowserRouter([
@@ -30,14 +31,24 @@ const router = () =>
       children: [
         {
           path: '/appointment',
-          element: <div>Layout</div>,
+          element: <Layout />,
           errorElement: <ErrorPage />,
           children: [
             {
               index: true,
               element: <div>Home</div>,
               errorElement: <ErrorPage />
-            }
+            },
+            {
+              path: '/appointment/user',
+              element: <div>User</div>,
+              errorElement: <ErrorPage />
+            },
+            {
+              path: '/appointment/setting',
+              element: <div>Setting</div>,
+              errorElement: <ErrorPage />
+            },
           ]
         }
       ]
