@@ -5,81 +5,96 @@ import { th } from 'date-fns/locale'
 import { HiMapPin, HiPhoto } from 'react-icons/hi2'
 import { useTranslation } from 'react-i18next'
 import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
-import LocationMap from '../../utils/LocationMap'
-import { AxiosError } from 'axios'
+import axios, { AxiosError } from 'axios'
 import { showToast } from '../../utils/toast'
-import { BiError } from 'react-icons/bi'
+import { BiCheck, BiError } from 'react-icons/bi'
+import { Appointment } from '../../types/appointment.type'
+import { resizeImage } from '../../constants/utils/image'
+import LocationMap from '../../utils/LocationMap'
 
 const AppointmentNew = () => {
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const [isButtonFixed, setIsButtonFixed] = useState(false)
-  const [formData, setFormData] = useState({
+  const [appointmentData, setAppointmentData] = useState<Appointment>({
     f_appidno: id,
-    f_appidgroup: 0,
-    f_appidname: '',
-    f_appstepno: 0,
     f_appcreatebyname: '',
-    f_appcreatedatetime: null,
     f_appcreateforhn: '',
     f_appcreateforname: '',
-    f_appcreatefordatetime: null,
-    f_appcreateconfirmname: '',
-    f_appcreateconfirmdatetime: null,
     f_appcreatecontacttelephone: '',
     f_appcreatecontacttelephonetwo: '',
     f_appcreatecontactaddress: '',
     f_appcreatecontactlat: '',
     f_appcreatecontactlon: '',
-    f_appcreatecontactacc: '',
     f_appdoctorduedate: '',
-    f_appadminduedate: '',
-    f_appadmindueque: 0,
-    f_appadminduequemax: 0,
-    f_appadminconfirmdate: '',
-    f_appadminconfirmtime: '',
-    f_appadminconfirmque: 0,
-    f_appadminconfirmvisitedate: null,
-    f_appcancelname: '',
-    f_appcanceldatetime: null,
-    f_apppayby: '',
-    f_apppaydatetime: null,
-    f_apppayprice: 0,
     f_apppictureappdoc: '',
-    f_apppictureappdocdatetime: null,
-    f_apppicturelisttestdoc: '',
-    f_apppicturelisttestdocdatetime: null,
-    f_apppicturebloodtube: '',
-    f_apppicturebloodtubedatetime: null,
-    f_apppictureslipdoc: '',
-    f_apppictureslipdocdatetime: null,
-    f_apppicturepatient: '',
-    f_apppicturepatientdatetime: null,
-    f_apppictureuser: '',
-    f_apppictureuserdatetime: null,
-    f_appadminvisitfullname: '',
-    f_appadminvisittelephone: '',
-    f_appadminvisitdatetime: null,
-    f_apppatientproveinfodatetime: null,
-    f_apppatientproveinfostatus: 0,
-    f_apppatientproveinfobyname: '',
-    f_appcomment: '',
-    f_appstatus: 0,
-    f_appbastatus: 0,
-    f_applastmodified: null
+    selectedFile: null
   })
   const [consent, setConsent] = useState(false)
+  const [isImageResizing, setIsImageResizing] = useState(false)
   const hiddenDateInputRef = useRef<HTMLInputElement>(null)
-
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const paragraphRef = useRef<HTMLHeadingElement>(null)
 
   const handleSubmit = async () => {
+    const formData = new FormData()
+    formData.append('f_appidno', String(appointmentData.f_appidno))
+    formData.append(
+      'f_appcreatebyname',
+      String(appointmentData.f_appcreatebyname)
+    )
+    formData.append(
+      'f_appcreateforhn',
+      String(appointmentData.f_appcreateforhn)
+    )
+    formData.append(
+      'f_appcreateforname',
+      String(appointmentData.f_appcreateforname)
+    )
+    formData.append(
+      'f_appcreatecontacttelephone',
+      String(appointmentData.f_appcreatecontacttelephone)
+    )
+    formData.append(
+      'f_appcreatecontacttelephonetwo',
+      String(appointmentData.f_appcreatecontacttelephonetwo)
+    )
+    formData.append(
+      'f_appcreatecontactaddress',
+      String(appointmentData.f_appcreatecontactaddress)
+    )
+    formData.append(
+      'f_appcreatecontactlat',
+      String(appointmentData.f_appcreatecontactlat)
+    )
+    formData.append(
+      'f_appcreatecontactlon',
+      String(appointmentData.f_appcreatecontactlon)
+    )
+    formData.append(
+      'f_appdoctorduedate',
+      String(appointmentData.f_appdoctorduedate)
+    )
+    formData.append('appointmentDoc', appointmentData.selectedFile as File)
     try {
-      console.log(formData)
+      const result = await axios.post(
+        `${import.meta.env.VITE_APP_API}/appointment`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+
+      showToast({
+        type: 'success',
+        icon: BiCheck,
+        message: result.data.message,
+        duration: 3000,
+        showClose: false
+      })
     } catch (error) {
       if (error instanceof AxiosError) {
         showToast({
@@ -99,40 +114,65 @@ const AppointmentNew = () => {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setAppointmentData(prev => ({ ...prev, [name]: value }))
   }
 
-  const formattedThaiDate = formData.f_appdoctorduedate
-    ? format(new Date(formData.f_appdoctorduedate), 'd MMMM yyyy', {
+  const formattedThaiDate = appointmentData.f_appdoctorduedate
+    ? format(new Date(appointmentData.f_appdoctorduedate), 'd MMMM yyyy', {
         locale: th
       })
     : 'กรุณาเลือกวันที่'
 
   const handleDateChange = (e: any) => {
-    setFormData({ ...formData, f_appdoctorduedate: e.target.value })
+    setAppointmentData({
+      ...appointmentData,
+      f_appdoctorduedate: e.target.value
+    })
   }
 
   const handleVisibleInputClick = () => {
     hiddenDateInputRef.current?.showPicker()
   }
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0]
-
-      if (file.type.startsWith('image/')) {
-        setSelectedFile(file)
-      } else {
-        alert('กรุณาเลือกไฟล์รูปภาพเท่านั้น')
-        setSelectedFile(null)
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        await showToast({
+          type: 'error',
+          icon: BiError,
+          message: t('imageSizeLimit'),
+          duration: 1800,
+          showClose: false
+        }).finally(async () => {
+          setAppointmentData({
+            ...appointmentData,
+            selectedFile: null,
+            f_apppictureappdoc: ''
+          })
+        })
+        return
       }
-    } else {
-      setSelectedFile(null)
+
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setIsImageResizing(true)
+      const reSized = await resizeImage(file).finally(() =>
+        setIsImageResizing(false)
+      )
+      setAppointmentData(prev => ({
+        ...prev,
+        selectedFile: reSized,
+        f_apppictureappdoc: URL.createObjectURL(file)
+      }))
     }
   }
 
   const handleRemoveImage = () => {
-    setSelectedFile(null)
+    setAppointmentData({
+      ...appointmentData,
+      selectedFile: null,
+      f_apppictureappdoc: ''
+    })
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -142,7 +182,7 @@ const AppointmentNew = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         position => {
-          setFormData(prev => ({
+          setAppointmentData(prev => ({
             ...prev,
             f_appcreatecontactlat: position.coords.latitude.toString(),
             f_appcreatecontactlon: position.coords.longitude.toString()
@@ -161,18 +201,6 @@ const AppointmentNew = () => {
       )
     }
   }
-
-  useEffect(() => {
-    if (!selectedFile) {
-      setPreviewUrl('')
-      return
-    }
-
-    const objectUrl = URL.createObjectURL(selectedFile)
-    setPreviewUrl(objectUrl)
-
-    return () => URL.revokeObjectURL(objectUrl)
-  }, [selectedFile])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -236,7 +264,7 @@ const AppointmentNew = () => {
           >
             <span className='text-xs'>{t('appointmentNumber')}</span>
             <h3 className='text-base text-primary font-bold'>
-              {formData.f_appidno}
+              {appointmentData.f_appidno}
             </h3>
           </div>
         </div>
@@ -253,7 +281,7 @@ const AppointmentNew = () => {
             ref={paragraphRef}
             className='mt-1 text-primary text-2xl font-bold'
           >
-            {formData.f_appidno}
+            {appointmentData.f_appidno}
           </h2>
         </header>
 
@@ -300,10 +328,10 @@ const AppointmentNew = () => {
                   </label>
                   <input
                     type='text'
-                    value={formData.f_appcreatebyname}
+                    value={appointmentData.f_appcreatebyname}
                     onChange={e =>
-                      setFormData({
-                        ...formData,
+                      setAppointmentData({
+                        ...appointmentData,
                         f_appcreatebyname: e.target.value
                       })
                     }
@@ -316,11 +344,27 @@ const AppointmentNew = () => {
                   </label>
                   <input
                     type='text'
-                    value={formData.f_appcreateforname}
+                    value={appointmentData.f_appcreateforname}
                     onChange={e =>
-                      setFormData({
-                        ...formData,
+                      setAppointmentData({
+                        ...appointmentData,
                         f_appcreateforname: e.target.value
+                      })
+                    }
+                    className='input input-bordered h-13 w-full rounded-3xl'
+                  />
+                </div>
+                <div className='form-control'>
+                  <label className='label'>
+                    <span className='label'>HN</span>
+                  </label>
+                  <input
+                    type='text'
+                    value={appointmentData.f_appcreateforhn}
+                    onChange={e =>
+                      setAppointmentData({
+                        ...appointmentData,
+                        f_appcreateforhn: e.target.value
                       })
                     }
                     className='input input-bordered h-13 w-full rounded-3xl'
@@ -342,7 +386,7 @@ const AppointmentNew = () => {
                   <input
                     type='date'
                     ref={hiddenDateInputRef}
-                    value={formData.f_appdoctorduedate}
+                    value={appointmentData.f_appdoctorduedate}
                     onChange={handleDateChange}
                     className='hidden'
                   />
@@ -354,7 +398,7 @@ const AppointmentNew = () => {
                   <input
                     type='tel'
                     name='f_appcreatecontacttelephone'
-                    value={formData.f_appcreatecontacttelephone}
+                    value={appointmentData.f_appcreatecontacttelephone}
                     onChange={handleInputChange}
                     className='input input-bordered h-13 w-full rounded-3xl'
                   />
@@ -366,7 +410,7 @@ const AppointmentNew = () => {
                   <input
                     type='tel'
                     name='f_appcreatecontacttelephonetwo'
-                    value={formData.f_appcreatecontacttelephonetwo}
+                    value={appointmentData.f_appcreatecontacttelephonetwo}
                     onChange={handleInputChange}
                     className='input input-bordered h-13 w-full rounded-3xl'
                   />
@@ -377,7 +421,7 @@ const AppointmentNew = () => {
                   </label>
                   <textarea
                     name='f_appcreatecontactaddress'
-                    value={formData.f_appcreatecontactaddress}
+                    value={appointmentData.f_appcreatecontactaddress}
                     onChange={handleInputChange}
                     className='textarea textarea-bordered h-24 w-full rounded-3xl'
                   ></textarea>
@@ -399,15 +443,15 @@ const AppointmentNew = () => {
                       type='file'
                       accept='image/*'
                       ref={fileInputRef}
-                      onChange={handleFileChange}
+                      onChange={handleImageChange}
                       className='hidden'
                       id='imageUploader'
                     />
 
-                    {previewUrl ? (
+                    {appointmentData.f_apppictureappdoc ? (
                       <div className='w-full h-full'>
                         <img
-                          src={previewUrl}
+                          src={appointmentData.f_apppictureappdoc}
                           alt='Preview'
                           className='w-full h-full object-cover rounded-3xl'
                         />
@@ -419,7 +463,7 @@ const AppointmentNew = () => {
                           <IoIosClose size={24} />
                         </button>
                       </div>
-                    ) : (
+                    ) : !isImageResizing ? (
                       <label
                         htmlFor='imageUploader'
                         className='w-full h-full md:h-full border-2 border-dashed rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'
@@ -432,6 +476,10 @@ const AppointmentNew = () => {
                           แตะเพื่ออัปโหลดรูปภาพ
                         </span>
                       </label>
+                    ) : (
+                      <div className='w-full h-full md:h-full rounded-3xl flex justify-center items-center bg-base-200'>
+                        <span className='loading loading-spinner loading-md'></span>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -440,11 +488,11 @@ const AppointmentNew = () => {
                     className='w-full h-52 md:h-full bg-base-200 rounded-3xl flex items-center justify-center text-base-content/50 overflow-hidden cursor-pointer'
                     onClick={getGeolocation}
                   >
-                    {formData.f_appcreatecontactlat &&
-                    formData.f_appcreatecontactlon ? (
+                    {appointmentData.f_appcreatecontactlat &&
+                    appointmentData.f_appcreatecontactlon ? (
                       <LocationMap
-                        lat={parseFloat(formData.f_appcreatecontactlat)}
-                        lon={parseFloat(formData.f_appcreatecontactlon)}
+                        lat={parseFloat(appointmentData.f_appcreatecontactlat)}
+                        lon={parseFloat(appointmentData.f_appcreatecontactlon)}
                       />
                     ) : (
                       <div className='w-full h-full md:h-full border-2 border-dashed rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
@@ -460,13 +508,17 @@ const AppointmentNew = () => {
                   </div>
 
                   <p className='text-xs text-center mt-2 text-base-content/70'>
-                    {formData.f_appcreatecontactlat &&
-                    formData.f_appcreatecontactlon ? (
+                    {appointmentData.f_appcreatecontactlat &&
+                    appointmentData.f_appcreatecontactlon ? (
                       <>
                         LAT:{' '}
-                        {parseFloat(formData.f_appcreatecontactlat).toFixed(5)},
-                        LON:{' '}
-                        {parseFloat(formData.f_appcreatecontactlon).toFixed(5)}
+                        {parseFloat(
+                          appointmentData.f_appcreatecontactlat
+                        ).toFixed(5)}
+                        , LON:{' '}
+                        {parseFloat(
+                          appointmentData.f_appcreatecontactlon
+                        ).toFixed(5)}
                       </>
                     ) : (
                       'ยังไม่มีพิกัด'
