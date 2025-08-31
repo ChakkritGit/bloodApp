@@ -112,7 +112,9 @@ const Navbar = () => {
             ? t('manageUser')
             : location.pathname === '/appointment/setting'
             ? t('manageSetting')
-            : ''}
+            : location.pathname.split('/')[
+                location.pathname.split('/').length - 1
+              ] ?? '—'}
         </Link>
       </div>
       <div className='navbar-end'></div>
