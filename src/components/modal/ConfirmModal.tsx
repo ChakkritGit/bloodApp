@@ -91,14 +91,16 @@ const ConfirmModal = forwardRef<ConfirmModalRef>((_, ref) => {
           )}
         </div>
         <div className='flex gap-3 mt-6'>
-          <button
-            type='button'
-            className='btn text-base font-medium flex-1 h-15 rounded-3xl'
-            onClick={handleClose}
-            disabled={isLoading}
-          >
-            {t('closeButton')}
-          </button>
+          {!isLoading && (
+            <button
+              type='button'
+              className='btn text-base font-medium flex-1 h-15 rounded-3xl'
+              onClick={handleClose}
+              disabled={isLoading}
+            >
+              {t('closeButton')}
+            </button>
+          )}
           <button
             type='button'
             className='btn btn-primary text-base font-bold flex-1 h-15 rounded-3xl'
