@@ -106,7 +106,7 @@ const AppointmentNew = () => {
           icon: BiError,
           message: error.response?.data.message,
           duration: error.response?.data.message.length > 27 ? 10000 : 1800,
-          showClose: false
+          showClose: true
         })
       } else {
         console.error(error)

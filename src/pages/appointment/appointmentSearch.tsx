@@ -1,8 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { showToast } from '../../utils/toast'
-import { BiError } from 'react-icons/bi'
 import { ApiResponse } from '../../types/api.response.type'
 import { Appointment } from '../../types/appointment.type'
 import { useTranslation } from 'react-i18next'
@@ -144,13 +142,7 @@ const AppointmentSearch = () => {
       setAppointmentData(result.data.data)
     } catch (error) {
       if (error instanceof AxiosError) {
-        showToast({
-          type: 'error',
-          icon: BiError,
-          message: error.response?.data.message,
-          duration: error.response?.data.message.length > 27 ? 10000 : 1800,
-          showClose: true
-        })
+        console.error(error.response?.data.message)
       } else {
         console.error(error)
       }

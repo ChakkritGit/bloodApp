@@ -56,6 +56,13 @@ export default {
     logOutTitle: 'ออกจากระบบ',
     logOutDescription: 'คุณต้องการออกจากระบบหรือไม่?',
     searchAppoinrment: 'ค้นหาใบนัดหมาย',
-    filterAll: 'ทั้งหมด'
+    filterAll: 'ทั้งหมด',
+    helloMrs: 'ผู้ป่วย,',
+    dateAppointment: 'วันที่นัดหมาย',
+    appoientmentTel: 'เบอร์โทรติดต่อ',
+    viewAndEdit: 'ดู/แก้ไข',
+    cancelQueue: 'ยกเลิกคิว',
+    cancelQueueDescription: 'คุณต้องการยกเลิกคิวหรือไม่',
+    okButton: 'ตกลง'
   }
 }

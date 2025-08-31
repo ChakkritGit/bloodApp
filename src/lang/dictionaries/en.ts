@@ -56,6 +56,13 @@ export default {
     logOutTitle: 'Sign out',
     logOutDescription: 'Are you sure you want to sign out?',
     searchAppoinrment: 'Search Appointment',
-    filterAll: 'All'
+    filterAll: 'All',
+    helloMrs: 'Patient,',
+    dateAppointment: 'Appointment date',
+    appoientmentTel: 'Contact number',
+    viewAndEdit: 'View/Edit',
+    cancelQueue: 'Cancel queue',
+    cancelQueueDescription: 'Do you want to cancel the queue?',
+    okButton: 'Ok'
   }
 }

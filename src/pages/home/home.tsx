@@ -1,27 +1,26 @@
 import { useTranslation } from 'react-i18next'
 import { Appointment } from '../../types/appointment.type'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
-import {
-  IoMdCheckmarkCircleOutline,
-  IoMdCloseCircleOutline
-} from 'react-icons/io'
-import { BiSearch, BiX } from 'react-icons/bi'
+import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { BiCheck, BiError, BiSearch, BiX } from 'react-icons/bi'
 import AppointmentPagination from '../../components/pagination/appointment.pagination'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '../../types/api.response.type'
 import {
   HiCalendarDateRange,
+  HiCalendarDays,
   HiCheckBadge,
   HiClipboardDocument,
   HiClock,
   HiMiniXCircle,
-  HiOutlineCalendarDays,
-  HiOutlinePencilSquare,
-  HiOutlinePhone,
-  HiOutlineTrash
+  HiPencilSquare,
+  HiPhone
 } from 'react-icons/hi2'
 import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
+import ConfirmModal, {
+  ConfirmModalRef
+} from '../../components/modal/ConfirmModal'
+import { showToast } from '../../utils/toast'
 
 const Home = () => {
   const { t } = useTranslation()
@@ -29,6 +28,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [appointmentData, setAppointmentData] = useState<Appointment[]>([])
   const [statusFilter, setStatusFilter] = useState<0 | 1 | 2 | 3 | 4 | 5>(0)
+  const confirmModalRef = useRef<ConfirmModalRef>(null)
 
   const fetchAppointmentData = async () => {
     setIsLoading(true)
@@ -48,6 +48,34 @@ const Home = () => {
     }
   }
 
+  const onCancel = async (appId: string) => {
+    try {
+      const result = await axios.patch(
+        `${import.meta.env.VITE_APP_API}/appointment/status/${appId}`
+      )
+      showToast({
+        type: 'success',
+        icon: BiCheck,
+        message: result.data.message,
+        duration: 3000,
+        showClose: false
+      })
+      await fetchAppointmentData()
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        showToast({
+          type: 'error',
+          icon: BiError,
+          message: error.response?.data.message,
+          duration: error.response?.data.message.length > 27 ? 10000 : 3000,
+          showClose: true
+        })
+      } else {
+        console.error(error)
+      }
+    }
+  }
+
   useEffect(() => {
     fetchAppointmentData()
   }, [])
@@ -55,21 +83,21 @@ const Home = () => {
   const getStatusInfo = (step: number): { text: string; className: string } => {
     switch (step) {
       case 1:
-        return { text: 'รอพิจารณาและยืนยันรายการ', className: 'badge-warning' }
+        return { text: t('stepAppOne'), className: 'badge-warning' }
       case 2:
         return {
-          text: 'ยืนยันรายการและวันนัดหมายแล้ว',
+          text: t('stepAppTwo'),
           className: 'badge-success'
         }
       case 3:
         return {
-          text: 'เตรียมการและเอกสารเพื่อเข้าตรวจตามนัด',
+          text: t('stepAppThree'),
           className: 'badge-info'
         }
       case 4:
-        return { text: 'เข้าดำเนินการตรวจแล้ว', className: 'badge-accent' }
+        return { text: t('stepAppFour'), className: 'badge-accent' }
       case 5:
-        return { text: 'ยกเลิกการนัดหมาย', className: 'badge-error' }
+        return { text: t('stepAppFri'), className: 'badge-error' }
       default:
         return { text: 'ไม่ระบุสถานะ', className: 'badge-ghost' }
     }
@@ -93,23 +121,30 @@ const Home = () => {
       <div
         key={appointment.f_appidno}
         className={`card w-full max-w-sm bg-base-100 rounded-[40px] shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
-          status.text.includes('ยกเลิก') ? 'opacity-60' : ''
+          status.text.includes(t('stepAppFri')) ? 'opacity-60' : ''
         }`}
       >
         <div className='card-body p-6'>
-          <div className='flex justify-between items-start mb-4'>
-            <div>
-              <h2 className='card-title text-xl font-bold'>
-                คุณ {appointment.f_appcreateforname || 'ไม่ระบุชื่อ'}
-              </h2>
-              <p className='text-sm text-base-content/70'>
-                HN: {appointment.f_appcreateforhn || '-'}
-              </p>
-            </div>
+          <div className='flex items-center justify-between'>
+            <h2 className='font-bold text-xl'>{t('helloMrs')}</h2>
             <div
-              className={`badge badge-lg ${status.className} text-xs font-semibold`}
+              className={`badge badge-lg h-max py-1.5 ${status.className} text-xs font-semibold flex-shrink-0 text-center`}
             >
               {status.text}
+            </div>
+          </div>
+
+          <div className='flex justify-between items-start gap-2 mb-4'>
+            <div className='flex-1 min-w-0'>
+              <h2
+                className='card-title text-xl font-bold truncate'
+                title={appointment.f_appcreateforname || 'ไม่ระบุชื่อ'}
+              >
+                {appointment.f_appcreateforname || 'ไม่ระบุชื่อ'}
+              </h2>
+              <p className='text-sm text-base-content/70 truncate'>
+                HN: {appointment.f_appcreateforhn || '-'}
+              </p>
             </div>
           </div>
 
@@ -117,32 +152,51 @@ const Home = () => {
 
           <div className='space-y-3 mt-4 text-sm'>
             <div className='flex items-center gap-3'>
-              <HiOutlineCalendarDays className='w-4 h-4 text-base-content/50' />
-              <span className='font-semibold mr-1'>วันที่นัดหมาย:</span>
+              <HiCalendarDays size={18} className='text-base-content/50' />
+              <span className='font-semibold mr-1'>
+                {t('dateAppointment')}:
+              </span>
               <span>{formattedDueDate}</span>
             </div>
             <div className='flex items-center gap-3'>
-              <HiOutlinePhone className='w-4 h-4 text-base-content/50' />
-              <span className='font-semibold mr-1'>เบอร์โทรติดต่อ:</span>
+              <HiPhone size={18} className='text-base-content/50' />
+              <span className='font-semibold mr-1'>
+                {t('appoientmentTel')}:
+              </span>
               <span>{appointment.f_appcreatecontacttelephone || '-'}</span>
             </div>
           </div>
 
           <div className='card-actions mt-6'>
             <div className='flex gap-3 w-full'>
-              <button
-                // onClick={() => onCancel(appointment.f_appidno)}
-                className='btn btn-outline btn-error flex-1 rounded-3xl'
+              {
+								!status.text.includes(t('stepAppFour')) && <button
+                onClick={async () => {
+                  const confirmed = await confirmModalRef.current?.show({
+                    title: t('cancelQueue'),
+                    description: t('cancelQueueDescription'),
+                    buttonConfirmText: t('okButton'),
+                    type: 'error'
+                  })
+
+                  if (confirmed) {
+                    onCancel(appointment.f_appidno)
+                  }
+                }}
+                className={`btn btn-outline btn-error flex-1 rounded-3xl ${
+                  status.text.includes('ยกเลิก') ? 'pointer-events-none' : ''
+                }`}
               >
-                <HiOutlineTrash className='h-5 w-5' />
-                ยกเลิก
+                <HiMiniXCircle size={20} />
+                {t('closeButton')}
               </button>
+							}
               <button
                 // onClick={() => onViewDetails(appointment.f_appidno)}
-                className='btn btn-primary flex-1 rounded-3xl'
+                className='btn btn-primary flex-2 rounded-3xl'
               >
-                <HiOutlinePencilSquare className='h-5 w-5' />
-                ดู/แก้ไข
+                <HiPencilSquare size={20} />
+                {t('viewAndEdit')}
               </button>
             </div>
           </div>
@@ -265,6 +319,8 @@ const Home = () => {
           )}
         </>
       )}
+
+      <ConfirmModal ref={confirmModalRef} />
     </div>
   )
 }
