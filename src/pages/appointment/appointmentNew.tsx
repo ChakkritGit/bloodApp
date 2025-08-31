@@ -95,7 +95,7 @@ const AppointmentNew = () => {
         duration: 3000,
         showClose: false
       })
-      navigate('/', { replace: true })
+      navigate(`/appointment/search/${appointmentData.f_appidno}`, { replace: true })
     } catch (error) {
       if (error instanceof AxiosError) {
         showToast({
@@ -233,7 +233,7 @@ const AppointmentNew = () => {
         <span>{t('back')}</span>
       </button>
       <div
-        className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-100/70 backdrop-blur-xl shadow-md hadow-md z-50 select-none transition-all duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-100/70 backdrop-blur-xl shadow-md z-50 select-none transition-all duration-300 ease-in-out ${
           isButtonFixed
             ? 'translate-y-0 opacity-100'
             : '-translate-y-full opacity-0'
