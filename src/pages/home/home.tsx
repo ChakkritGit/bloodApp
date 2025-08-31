@@ -21,9 +21,11 @@ import ConfirmModal, {
   ConfirmModalRef
 } from '../../components/modal/ConfirmModal'
 import { showToast } from '../../utils/toast'
+import { useNavigate } from 'react-router-dom'
 
 const Home = () => {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [appointmentData, setAppointmentData] = useState<Appointment[]>([])
@@ -74,6 +76,10 @@ const Home = () => {
         console.error(error)
       }
     }
+  }
+
+  const onViewDetails = (appId: string) => {
+    navigate(`/appointment/confirm/${appId}`)
   }
 
   useEffect(() => {
@@ -169,30 +175,30 @@ const Home = () => {
 
           <div className='card-actions mt-6'>
             <div className='flex gap-3 w-full'>
-              {
-								!status.text.includes(t('stepAppFour')) && <button
-                onClick={async () => {
-                  const confirmed = await confirmModalRef.current?.show({
-                    title: t('cancelQueue'),
-                    description: t('cancelQueueDescription'),
-                    buttonConfirmText: t('okButton'),
-                    type: 'error'
-                  })
+              {!status.text.includes(t('stepAppFour')) && (
+                <button
+                  onClick={async () => {
+                    const confirmed = await confirmModalRef.current?.show({
+                      title: t('cancelQueue'),
+                      description: t('cancelQueueDescription'),
+                      buttonConfirmText: t('okButton'),
+                      type: 'error'
+                    })
 
-                  if (confirmed) {
-                    onCancel(appointment.f_appidno)
-                  }
-                }}
-                className={`btn btn-outline btn-error flex-1 rounded-3xl ${
-                  status.text.includes('ยกเลิก') ? 'pointer-events-none' : ''
-                }`}
-              >
-                <HiMiniXCircle size={20} />
-                {t('closeButton')}
-              </button>
-							}
+                    if (confirmed) {
+                      onCancel(appointment.f_appidno)
+                    }
+                  }}
+                  className={`btn btn-outline btn-error flex-1 rounded-3xl ${
+                    status.text.includes('ยกเลิก') ? 'pointer-events-none' : ''
+                  }`}
+                >
+                  <HiMiniXCircle size={20} />
+                  {t('closeButton')}
+                </button>
+              )}
               <button
-                // onClick={() => onViewDetails(appointment.f_appidno)}
+                onClick={() => onViewDetails(appointment.f_appidno)}
                 className='btn btn-primary flex-2 rounded-3xl'
               >
                 <HiPencilSquare size={20} />

@@ -10,6 +10,7 @@ import Layout from '../pages/layout/layout'
 import Home from '../pages/home/home'
 import User from '../pages/user/user'
 import Setting from '../pages/setting/setting'
+import AppointmentConfirm from '../pages/appointment/appointmentConfirm'
 
 const router = () =>
   createBrowserRouter([
@@ -52,6 +53,11 @@ const router = () =>
               element: <Setting />,
               errorElement: <ErrorPage />
             },
+            {
+              path: '/appointment/confirm/:id',
+              element: <AppointmentConfirm />,
+              errorElement: <ErrorPage />
+            }
           ]
         }
       ]

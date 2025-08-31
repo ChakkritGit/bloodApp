@@ -174,12 +174,6 @@ const AppointmentSearch = () => {
     }
   }, [])
 
-  // useEffect(() => {
-  //   if (openImageRef.current && openImageRef.current.open) {
-  //     setOpnemImage('')
-  //   }
-  // }, [])
-
   return (
     <div className='min-h-screen bg-base-200 p-4'>
       <button
