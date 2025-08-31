@@ -5,6 +5,7 @@ import {
   HiCog6Tooth,
   HiMiniArrowRightStartOnRectangle,
   HiMiniBars3BottomLeft,
+  HiMiniMagnifyingGlass,
   HiUserGroup
 } from 'react-icons/hi2'
 import { Link, useLocation } from 'react-router-dom'
@@ -38,6 +39,17 @@ const Navbar = () => {
               >
                 <HiCalendarDays size={24} />
                 <span>{t('manageAppointment')}</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to='/'
+                className={`flex items-center h-12 rounded-3xl gap-2 text-base ${
+                  location.pathname === '/' ? 'bg-primary text-base-100' : ''
+                }`}
+              >
+                <HiMiniMagnifyingGlass size={24} />
+                <span>{t('searchAppoinrment')}</span>
               </Link>
             </li>
             <li>

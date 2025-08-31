@@ -54,6 +54,8 @@ export default {
     closeButton: 'ยกเลิก',
     confirmButton: 'ยืนยัน',
     logOutTitle: 'ออกจากระบบ',
-    logOutDescription: 'คุณต้องการออกจากระบบหรือไม่?'
+    logOutDescription: 'คุณต้องการออกจากระบบหรือไม่?',
+    searchAppoinrment: 'ค้นหาใบนัดหมาย',
+    filterAll: 'ทั้งหมด'
   }
 }

@@ -54,6 +54,8 @@ export default {
     closeButton: 'Cancel',
     confirmButton: 'Confirm',
     logOutTitle: 'Sign out',
-    logOutDescription: 'Are you sure you want to sign out?'
+    logOutDescription: 'Are you sure you want to sign out?',
+    searchAppoinrment: 'Search Appointment',
+    filterAll: 'All'
   }
 }

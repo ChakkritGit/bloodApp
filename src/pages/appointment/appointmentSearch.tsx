@@ -109,6 +109,31 @@ const AppointmentSearch = () => {
     4: t('stepAppFour')
   }
 
+  const getStatusInfo = (step: number): { text: string; className: string } => {
+    switch (step) {
+      case 1:
+        return { text: 'รอพิจารณาและยืนยันรายการ', className: 'text-amber-400' }
+      case 2:
+        return {
+          text: 'ยืนยันรายการและวันนัดหมายแล้ว',
+          className: 'text-green-400'
+        }
+      case 3:
+        return {
+          text: 'เตรียมการและเอกสารเพื่อเข้าตรวจตามนัด',
+          className: 'text-blue-400'
+        }
+      case 4:
+        return { text: 'เข้าดำเนินการตรวจแล้ว', className: 'text-purple-400' }
+      case 5:
+        return { text: 'ยกเลิกการนัดหมาย', className: 'text-red-400' }
+      default:
+        return { text: 'ไม่ระบุสถานะ', className: 'text-ghost' }
+    }
+  }
+
+  const status = getStatusInfo(appointmentData.f_appstepno)
+
   const fetchAppointment = async () => {
     setIsLoading(true)
     try {
@@ -245,7 +270,9 @@ const AppointmentSearch = () => {
                   <div className='grid grid-cols-1 gap-4'>
                     <div>
                       <div className='label'>{t('lastStatus')}</div>
-                      <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
+                      <div
+                        className={`${status.className} inline-flex items-center font-medium text-base h-10 w-full`}
+                      >
                         {statusMap[appointmentData.f_appstepno] ??
                           t('stepAppFri')}
                       </div>
