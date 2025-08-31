@@ -7,13 +7,14 @@ import {
   HiMiniBars3BottomLeft,
   HiUserGroup
 } from 'react-icons/hi2'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import ConfirmModal, { ConfirmModalRef } from '../modal/ConfirmModal'
 import { cookieOptions, cookies } from '../../constants/utils/utilsConstants'
 
 const Navbar = () => {
   const { t } = useTranslation()
   const location = useLocation()
+  const navigate = useNavigate()
   const confirmModalRef = useRef<ConfirmModalRef>(null)
 
   return (
@@ -80,7 +81,8 @@ const Navbar = () => {
                   if (confirmed) {
                     cookies.remove('tokenObject', cookieOptions)
                     cookies.update()
-                    window.location.href = '/'
+                    // window.location.href = '/'
+                    navigate(`/`, { replace: true })
                   }
                 }}
                 className={`flex items-center h-12 rounded-3xl gap-2 text-base text-red-500 active:!bg-red-500 active:!text-base-100 duration-300 ease-in-out`}

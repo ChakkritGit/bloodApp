@@ -50,7 +50,7 @@ const Login = () => {
       )
       cookies.update()
       dispatch(setCookieEncode(String(accessToken(tokenObject))))
-      navigate(`/appointment`)
+      navigate(`/appointment`, { replace: true })
     } catch (error) {
       if (error instanceof AxiosError) {
         showToast({
