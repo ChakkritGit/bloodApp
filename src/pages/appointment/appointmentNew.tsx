@@ -95,6 +95,7 @@ const AppointmentNew = () => {
         duration: 3000,
         showClose: false
       })
+      navigate('/', { replace: true })
     } catch (error) {
       if (error instanceof AxiosError) {
         showToast({
