@@ -1,168 +1,650 @@
-import { FC, useRef } from 'react'
-import { useParams } from 'react-router-dom'
-import { HiOutlinePlus, HiOutlineXCircle } from 'react-icons/hi2'
-
-interface SingleImageUploaderProps {
-  label: string
-  previewUrl: string
-  isResizing?: boolean
-  onFileSelect: (file: File | null) => void
-}
-
-const SingleImageUploader: FC<SingleImageUploaderProps> = ({
-  label,
-  previewUrl,
-  isResizing = false,
-  onFileSelect
-}) => {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const handleRemove = () => {
-    onFileSelect(null)
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }
-
-  return (
-    <div className='form-control w-full'>
-      <label className='label'>
-        <span className='label-text'>{label}</span>
-      </label>
-      <input
-        type='file'
-        accept='image/*'
-        ref={fileInputRef}
-        onChange={e => onFileSelect(e.target.files?.[0] || null)}
-        className='hidden'
-      />
-      <div className='w-full h-52 md:h-60 rounded-3xl relative'>
-        {previewUrl ? (
-          <>
-            <img
-              src={previewUrl}
-              alt='Preview'
-              className='w-full h-full object-cover rounded-3xl'
-            />
-            <button
-              type='button'
-              onClick={handleRemove}
-              className='btn btn-circle btn-sm btn-error absolute top-2 right-2'
-            >
-              <HiOutlineXCircle size={20} />
-            </button>
-          </>
-        ) : isResizing ? (
-          <div className='w-full h-full rounded-3xl flex justify-center items-center bg-base-200'>
-            <span className='loading loading-spinner loading-md'></span>
-          </div>
-        ) : (
-          <button
-            type='button'
-            onClick={() => fileInputRef.current?.click()}
-            className='w-full h-full rounded-3xl flex flex-col justify-center items-center bg-base-200 hover:bg-base-300 transition-colors border-2 border-dashed'
-          >
-            <HiOutlinePlus size={40} className='text-base-content/50 mb-2' />
-            <span className='text-sm text-base-content/70'>เพิ่มรูปภาพ</span>
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
-
-interface MultiImageUploaderProps {
-  label: string
-  previews: string[]
-  isResizing?: boolean
-  maxFiles?: number
-  onFilesAdd: (files: File[]) => void
-  onFileRemove: (index: number) => void
-}
-
-const MultiImageUploader: FC<MultiImageUploaderProps> = ({
-  label,
-  previews,
-  isResizing = false,
-  maxFiles = 10,
-  onFilesAdd,
-  onFileRemove
-}) => {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const totalFiles = previews.length
-
-  return (
-    <div className='form-control w-full'>
-      <label className='label'>
-        <span className='label-text'>
-          {label} ({totalFiles}/{maxFiles})
-        </span>
-      </label>
-      <input
-        type='file'
-        accept='image/*'
-        multiple
-        ref={fileInputRef}
-        onChange={e => e.target.files && onFilesAdd(Array.from(e.target.files))}
-        className='hidden'
-      />
-      <div className='w-full min-h-[13rem] md:min-h-[15rem] p-2 rounded-3xl bg-base-200'>
-        <div className='flex gap-3 overflow-x-auto h-full'>
-          {totalFiles < maxFiles && (
-            <button
-              type='button'
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isResizing}
-              className='flex-shrink-0 w-32 h-44 md:w-40 md:h-52 rounded-2xl flex flex-col justify-center items-center bg-base-100 hover:bg-base-300/50 transition-colors border-2 border-dashed disabled:cursor-wait'
-            >
-              {isResizing ? (
-                <span className='loading loading-spinner'></span>
-              ) : (
-                <HiOutlinePlus size={32} className='text-base-content/50' />
-              )}
-            </button>
-          )}
-          {previews.map((url, index) => (
-            <div
-              key={index}
-              className='flex-shrink-0 w-32 h-44 md:w-40 md:h-52 rounded-2xl relative'
-            >
-              <img
-                src={url}
-                alt={`Preview ${index}`}
-                className='w-full h-full object-cover rounded-2xl'
-              />
-              <button
-                type='button'
-                onClick={() => onFileRemove(index)}
-                className='btn btn-circle btn-xs btn-error absolute top-1 right-1'
-              >
-                <HiOutlineXCircle size={16} />
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
+import { FC, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Appointment } from '../../types/appointment.type'
+import { delay } from '../../constants/utils/utilsConstants'
+import { HiMapPin, HiMiniXMark, HiPhoto } from 'react-icons/hi2'
+import { format } from 'date-fns'
+import { th } from 'date-fns/locale'
+import LocationMap from '../../utils/LocationMap'
+import { IoIosArrowBack, IoIosRemove } from 'react-icons/io'
+import { ApiResponse } from '../../types/api.response.type'
+import axios, { AxiosError } from 'axios'
 
 const AppointmentConfirm: FC = () => {
+  const { t } = useTranslation()
   const { id } = useParams()
+  const navigate = useNavigate()
+  const [isButtonFixed, setIsButtonFixed] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [openImage, setOpnemImage] = useState('')
+  const [appointmentData, setAppointmentData] = useState<Appointment>({
+    f_appidno: '',
+    f_appidgroup: 0,
+    f_appidname: '',
+    f_appstepno: 0,
+    f_appcreatebyname: '',
+    f_appcreatedatetime: '',
+    f_appcreateforhn: '',
+    f_appcreateforname: '',
+    f_appcreatefordatetime: '',
+    f_appcreateconfirmname: '',
+    f_appcreateconfirmdatetime: '',
+    f_appcreatecontacttelephone: '',
+    f_appcreatecontacttelephonetwo: '',
+    f_appcreatecontactaddress: '',
+    f_appcreatecontactlat: '',
+    f_appcreatecontactlon: '',
+    f_appcreatecontactacc: '',
+    f_appdoctorduedate: '',
+    f_appadminduedate: '',
+    f_appadmindueque: 0,
+    f_appadminduequemax: 0,
+    f_appadminconfirmdate: '',
+    f_appadminconfirmtime: '',
+    f_appadminconfirmque: 0,
+    f_appadminconfirmvisitedate: '',
+    f_appcancelname: '',
+    f_appcanceldatetime: '',
+    f_apppayby: '',
+    f_apppaydatetime: '',
+    f_apppayprice: '0',
+    f_apppictureappdoc: '',
+    f_apppictureappdocdatetime: '',
+    f_apppicturelisttestdoc: '',
+    f_apppicturelisttestdocdatetime: '',
+    f_apppicturebloodtube: '',
+    f_apppicturebloodtubedatetime: '',
+    f_apppictureslipdoc: '',
+    f_apppictureslipdocdatetime: '',
+    f_apppicturepatient: '',
+    f_apppicturepatientdatetime: '',
+    f_apppictureuser: '',
+    f_apppictureuserdatetime: '',
+    f_appadminvisitfullname: '',
+    f_appadminvisittelephone: '',
+    f_appadminvisitdatetime: '',
+    f_apppatientproveinfodatetime: '',
+    f_apppatientproveinfostatus: '',
+    f_apppatientproveinfobyname: '',
+    f_appcomment: '',
+    f_appstatus: '',
+    f_appbastatus: '',
+    f_applastmodified: '',
+    files: {
+      appointment: null,
+      slip: null,
+      testListDocs: [],
+      bloodTubes: [],
+      others: []
+    }
+  })
+  const paragraphRef = useRef<HTMLHeadingElement>(null)
+  const openImageRef = useRef<HTMLDialogElement>(null)
+  const [zoom, setZoom] = useState(false)
+
+  const fetchAppointment = async () => {
+    setIsLoading(true)
+    try {
+      const result = await axios.get<ApiResponse<Appointment>>(
+        `${import.meta.env.VITE_APP_API}/appointment/search/${id}`
+      )
+
+      setAppointmentData(result.data.data)
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error(error.response?.data.message)
+      } else {
+        console.error(error)
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleSubmit = async () => {}
+
+  const getStatusInfo = (step: number): { text: string; className: string } => {
+    switch (step) {
+      case 1:
+        return { text: 'รอพิจารณาและยืนยันรายการ', className: 'text-amber-400' }
+      case 2:
+        return {
+          text: 'ยืนยันรายการและวันนัดหมายแล้ว',
+          className: 'text-green-400'
+        }
+      case 3:
+        return {
+          text: 'เตรียมการและเอกสารเพื่อเข้าตรวจตามนัด',
+          className: 'text-blue-400'
+        }
+      case 4:
+        return { text: 'เข้าดำเนินการตรวจแล้ว', className: 'text-purple-400' }
+      case 5:
+        return { text: 'ยกเลิกการนัดหมาย', className: 'text-red-400' }
+      default:
+        return { text: 'ไม่ระบุสถานะ', className: 'text-ghost' }
+    }
+  }
+
+  const formattedThaiDate = appointmentData.f_appdoctorduedate
+    ? format(new Date(appointmentData.f_appdoctorduedate), 'd MMMM yyyy', {
+        locale: th
+      })
+    : t('selectDate')
+
+  const formattedThaiServiceDate = appointmentData.f_appadminduedate ? (
+    format(new Date(appointmentData.f_appadminduedate), 'd MMMM yyyy', {
+      locale: th
+    })
+  ) : (
+    <div className='font-medium text-primary'>
+      <IoIosRemove size={32} />
+    </div>
+  )
+
+  const status = getStatusInfo(appointmentData.f_appstepno)
+
+  const statusMap: Record<number, string> = {
+    1: t('stepAppOne'),
+    2: t('stepAppTwo'),
+    3: t('stepAppThree'),
+    4: t('stepAppFour')
+  }
+
+  useEffect(() => {
+    if (!id || id === undefined) return
+    fetchAppointment()
+  }, [id])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (paragraphRef.current) {
+        if (paragraphRef.current.getBoundingClientRect().bottom < 80) {
+          setIsButtonFixed(true)
+        } else {
+          setIsButtonFixed(false)
+        }
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   return (
-    <div>
-      <SingleImageUploader
-        label={''}
-        previewUrl={''}
-        onFileSelect={file => {}}
-        isResizing={false}
-      />
-      <MultiImageUploader
-        label={''}
-        previews={[]}
-        onFilesAdd={newFiles => {}}
-        onFileRemove={index => {}}
-        isResizing={false}
-      />
+    <div className='min-h-screen'>
+      <button
+        className={`btn btn-ghost text-primary active:text-primary/50 pr-2 pl-0 h-10 select-none rounded-3xl transition-all ${
+          isButtonFixed ? 'invisible' : 'visible'
+        }`}
+        onClick={() => navigate('/appointment', { replace: true })}
+      >
+        <IoIosArrowBack size={24} />
+        <span>{t('back')}</span>
+      </button>
+      {!isLoading ? (
+        <>
+          <div
+            className={`fixed left-0 top-[64px] p-2 w-full rounded-b-3xl bg-base-100 shadow-md z-40 select-none transition-all duration-300 ease-in-out ${
+              isButtonFixed
+                ? 'translate-y-0 opacity-100'
+                : '-translate-y-full opacity-0'
+            }`}
+          >
+            <div className='relative flex items-center justify-center h-10 overflow-hidden'>
+              <button
+                className={`btn btn-ghost text-primary active:text-primary/50 pr-2 pl-0 h-10 rounded-3xl absolute left-0 transition-all duration-300 ${
+                  isButtonFixed ? 'opacity-100' : 'opacity-0'
+                }`}
+                onClick={() => navigate('/appointment', { replace: true })}
+              >
+                <IoIosArrowBack size={24} />
+                <span>{t('back')}</span>
+              </button>
+
+              <div
+                className={`flex flex-col items-center cursor-pointer transition-all duration-300 ease-in-out ${
+                  isButtonFixed
+                    ? 'translate-y-0 opacity-100 delay-100'
+                    : 'translate-y-5 opacity-0'
+                }`}
+                onClick={() => {
+                  window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                  })
+                }}
+              >
+                <span className='text-xs'>{t('appointmentNumber')}</span>
+                <h3 className='text-base text-primary font-bold'>
+                  {appointmentData.f_appidno}
+                </h3>
+              </div>
+            </div>
+          </div>
+          <div className='max-w-4xl mx-auto pt-8'>
+            <header
+              className={`text-center transition-all duration-300 ease-in-out ${
+                isButtonFixed ? 'opacity-0' : 'opacity-100'
+              }`}
+            >
+              <h1 className='text-3xl font-bold'>
+                {t('appointmentViewHeadTitle')}
+              </h1>
+              <p className='label font-medium mt-3'>{t('appointmentNumber')}</p>
+              <h2
+                ref={paragraphRef}
+                className='mt-1 text-primary text-2xl font-bold'
+              >
+                {appointmentData.f_appidno}
+              </h2>
+            </header>
+
+            <div
+              className={`card w-full bg-base-100 shadow-xl rounded-[48px] transition-all duration-300 ease-in-out ${
+                isButtonFixed ? 'mt-20' : 'mt-8'
+              }`}
+            >
+              <div className='card-body gap-4'>
+                <section>
+                  <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
+                    {t('detailStatus')}
+                  </h3>
+                  <div className='grid grid-cols-1 gap-4'>
+                    <div>
+                      <div className='label'>{t('lastStatus')}</div>
+                      <div
+                        className={`${status.className} inline-flex items-center font-medium text-base h-10 w-full`}
+                      >
+                        {statusMap[appointmentData.f_appstepno] ??
+                          t('stepAppFri')}
+                      </div>
+                    </div>
+                    <div>
+                      <div className='label'>{t('confirmedBy')}</div>
+                      <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
+                        {appointmentData.f_appcreateconfirmname ? (
+                          <div className='flex flex-col'>
+                            <span>
+                              {appointmentData.f_appcreateconfirmname}
+                            </span>
+                            <span className='text-sm'>
+                              {appointmentData.f_appcreateconfirmdatetime
+                                ? format(
+                                    new Date(
+                                      appointmentData.f_appcreateconfirmdatetime
+                                    ),
+                                    'd MMMM yyyy',
+                                    {
+                                      locale: th
+                                    }
+                                  )
+                                : '—'}
+                            </span>
+                          </div>
+                        ) : (
+                          <IoIosRemove size={32} />
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <div className='label'>{t('queueNumber')}</div>
+                      <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
+                        {appointmentData.f_appadminduequemax ? (
+                          `${appointmentData.f_appadminduequemax} / 30`
+                        ) : (
+                          <IoIosRemove size={32} />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
+                    {t('patientAppointmentInfo')}
+                  </h3>
+                  <div className='grid grid-cols-1 gap-3'>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>{t('appointmentCreator')}</span>
+                      </label>
+                      <span className='inline-flex items-center font-medium text-base h-10 w-full'>
+                        {appointmentData.f_appcreatebyname}
+                      </span>
+                    </div>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>{t('patient')}</span>
+                      </label>
+                      <div className='inline-flex items-center font-medium text-base h-10 w-full'>
+                        {appointmentData.f_appcreateforname}
+                      </div>
+                    </div>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>HN</span>
+                      </label>
+                      <div className='inline-flex items-center font-medium text-base h-10 w-full'>
+                        {appointmentData.f_appcreateforhn}
+                      </div>
+                    </div>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>
+                          {t('scheduledDoctorVisit')}
+                        </span>
+                      </label>
+                      <div className='inline-flex items-center font-medium text-base h-10 w-full'>
+                        {formattedThaiDate}
+                      </div>
+                    </div>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>{t('serviceDate')}</span>
+                      </label>
+                      <div className='inline-flex items-center font-medium text-base h-10 w-full'>
+                        {formattedThaiServiceDate}
+                      </div>
+                    </div>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>{t('contactNumber')} 1</span>
+                      </label>
+                      <div className='inline-flex items-center font-medium text-base h-10 w-full'>
+                        {appointmentData.f_appcreatecontacttelephone}
+                      </div>
+                    </div>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>{t('contactNumber')} 2</span>
+                      </label>
+                      <div className='inline-flex items-center font-medium text-base h-10 w-full'>
+                        {appointmentData.f_appcreatecontacttelephonetwo}
+                      </div>
+                    </div>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>{t('serviceLocation')}</span>
+                      </label>
+                      <div className='inline-flex items-center font-medium text-base h-10 w-full'>
+                        {appointmentData.f_appcreatecontactaddress}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <h3 className='text-lg font-semibold border-b pb-2 mb-4'>
+                    {t('mapAndAttachments')}
+                  </h3>
+                  <div className='grid grid-cols-1 gap-6 items-start'>
+                    <div className='form-control w-full'>
+                      <label className='label'>
+                        <span className='label'>
+                          {t('appointmentSlipImage')}
+                        </span>
+                      </label>
+                      <div className='w-full h-52 md:h-84 rounded-3xl mt-3 relative'>
+                        {appointmentData.files?.appointment
+                          ?.f_appimageidpart ? (
+                          <div
+                            className='w-full h-full cursor-pointer hover:opacity-90 transition-opacity duration-300 ease-in-out'
+                            onClick={() => {
+                              setOpnemImage(
+                                import.meta.env.VITE_APP_IMG +
+                                  appointmentData.files?.appointment
+                                    ?.f_appimageidpart
+                              )
+                              openImageRef.current?.showModal()
+                            }}
+                          >
+                            <img
+                              src={
+                                import.meta.env.VITE_APP_IMG +
+                                appointmentData.files.appointment
+                                  .f_appimageidpart
+                              }
+                              alt='Preview'
+                              className='w-full h-full object-cover rounded-3xl'
+                            />
+                          </div>
+                        ) : (
+                          <label className='w-full h-full md:h-full rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
+                            <HiPhoto
+                              size={40}
+                              className='text-base-content/50 mb-2'
+                            />
+                          </label>
+                        )}
+                      </div>
+
+                      <label className='label mt-3'>
+                        <span className='label'>{t('testListImage')}</span>
+                      </label>
+
+                      <div className='w-full h-52 md:h-84 mt-3 relative'>
+                        {appointmentData.files?.testListDocs.length > 0 ? (
+                          <div className='flex gap-3 overflow-x-auto h-full pr-10 rounded-3xl'>
+                            {appointmentData.files?.testListDocs.map(
+                              (img, index) => (
+                                <div
+                                  key={index}
+                                  className='flex-shrink-0 w-52 h-full rounded-3xl cursor-pointer hover:opacity-90 transition-opacity duration-300 ease-in-out'
+                                  onClick={() => {
+                                    setOpnemImage(
+                                      import.meta.env.VITE_APP_IMG +
+                                        img.f_appimageidpart
+                                    )
+                                    openImageRef.current?.showModal()
+                                  }}
+                                >
+                                  <img
+                                    src={
+                                      import.meta.env.VITE_APP_IMG +
+                                      img.f_appimageidpart
+                                    }
+                                    alt='Preview'
+                                    className='w-full h-full object-cover rounded-3xl'
+                                  />
+                                </div>
+                              )
+                            )}
+                          </div>
+                        ) : (
+                          <label className='w-full h-full md:h-full rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
+                            <HiPhoto
+                              size={40}
+                              className='text-base-content/50 mb-2'
+                            />
+                          </label>
+                        )}
+                      </div>
+
+                      <label className='label mt-3'>
+                        <span className='label'>{t('bloodTubsImage')}</span>
+                      </label>
+
+                      <div className='w-full h-52 md:h-84 mt-3 relative'>
+                        {appointmentData.files?.bloodTubes.length > 0 ? (
+                          <div className='flex gap-3 overflow-x-auto h-full pr-10 rounded-3xl'>
+                            {appointmentData.files?.bloodTubes.map(
+                              (img, index) => (
+                                <div
+                                  key={index}
+                                  className='flex-shrink-0 w-52 h-full rounded-3xl cursor-pointer hover:opacity-90 transition-opacity duration-300 ease-in-out'
+                                  onClick={() => {
+                                    setOpnemImage(
+                                      import.meta.env.VITE_APP_IMG +
+                                        img.f_appimageidpart
+                                    )
+                                    openImageRef.current?.showModal()
+                                  }}
+                                >
+                                  <img
+                                    src={
+                                      import.meta.env.VITE_APP_IMG +
+                                      img.f_appimageidpart
+                                    }
+                                    alt='Preview'
+                                    className='w-full h-full object-cover rounded-3xl'
+                                  />
+                                </div>
+                              )
+                            )}
+                          </div>
+                        ) : (
+                          <label className='w-full h-full md:h-full rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
+                            <HiPhoto
+                              size={40}
+                              className='text-base-content/50 mb-2'
+                            />
+                          </label>
+                        )}
+                      </div>
+
+                      <label className='label'>
+                        <span className='label mt-3'>
+                          {t('paymentSlipImage')}
+                        </span>
+                      </label>
+
+                      <div className='w-full h-52 md:h-84 rounded-3xl mt-3 relative'>
+                        {appointmentData.files?.slip?.f_appimageidpart ? (
+                          <div
+                            className='w-full h-full cursor-pointer hover:opacity-90 transition-opacity duration-300 ease-in-out'
+                            onClick={() => {
+                              setOpnemImage(
+                                import.meta.env.VITE_APP_IMG +
+                                  appointmentData.files?.appointment
+                                    ?.f_appimageidpart
+                              )
+                              openImageRef.current?.showModal()
+                            }}
+                          >
+                            <img
+                              src={
+                                import.meta.env.VITE_APP_IMG +
+                                appointmentData.files.slip.f_appimageidpart
+                              }
+                              alt='Preview'
+                              className='w-full h-full object-cover rounded-3xl'
+                            />
+                          </div>
+                        ) : (
+                          <label className='w-full h-full md:h-full rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
+                            <HiPhoto
+                              size={40}
+                              className='text-base-content/50 mb-2'
+                            />
+                          </label>
+                        )}
+                      </div>
+                    </div>
+                    <div className='w-full h-52 md:h-84'>
+                      <div className='w-full h-52 md:h-full bg-base-200 rounded-3xl flex items-center justify-center text-base-content/50 overflow-hidden cursor-pointer'>
+                        {appointmentData.f_appcreatecontactlat &&
+                        appointmentData.f_appcreatecontactlon ? (
+                          <LocationMap
+                            lat={parseFloat(
+                              appointmentData.f_appcreatecontactlat
+                            )}
+                            lon={parseFloat(
+                              appointmentData.f_appcreatecontactlon
+                            )}
+                          />
+                        ) : (
+                          <div className='w-full h-full md:h-full border-2 border-dashed rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
+                            <HiMapPin
+                              size={40}
+                              className='text-base-content/50 mb-2'
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <p className='text-xs text-center mt-2 text-base-content/70 mb-3'>
+                      {appointmentData.f_appcreatecontactlat &&
+                      appointmentData.f_appcreatecontactlon ? (
+                        <>
+                          LAT:{' '}
+                          {parseFloat(
+                            appointmentData.f_appcreatecontactlat
+                          ).toFixed(5)}
+                          , LON:{' '}
+                          {parseFloat(
+                            appointmentData.f_appcreatecontactlon
+                          ).toFixed(5)}
+                        </>
+                      ) : (
+                        t('noLocation')
+                      )}
+                    </p>
+                  </div>
+
+                  <div className='card-actions flex-col justify-between border-t pt-6'>
+                    <button
+                      // disabled={!consent}
+                      className='btn btn-primary w-full h-13 rounded-3xl text-lg font-bold'
+                      onClick={handleSubmit}
+                    >
+                      {t('saveButton')}
+                    </button>
+                    <button
+                      className='btn w-full h-13 rounded-3xl text-lg font-bold'
+                      onClick={() =>
+                        navigate('/appointment', { replace: true })
+                      }
+                    >
+                      {t('cancelButton')}
+                    </button>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className='flex items-center justify-center'>
+          <span className='loading loading-spinner loading-md'></span>
+        </div>
+      )}
+
+      <dialog
+        ref={openImageRef}
+        className='modal'
+        onClose={async () => {
+          await delay(300)
+          setOpnemImage('')
+          setZoom(false)
+        }}
+      >
+        <div className='modal-box rounded-[48px]'>
+          <form method='dialog'>
+            <button className='btn btn-sm bg-base-200 text-base-content/90 btn-circle btn-ghost absolute right-7 top-5'>
+              <HiMiniXMark size={32} />
+            </button>
+          </form>
+          <div className='mt-12 max-h-[70vh] overflow-auto flex justify-center'>
+            <img
+              src={openImage}
+              alt='Preview'
+              onClick={() => setZoom(!zoom)}
+              className={`rounded-3xl transition-transform duration-300 cursor-zoom-in ${
+                zoom ? 'scale-200 cursor-zoom-out' : 'scale-100'
+              }`}
+            />
+          </div>
+        </div>
+      </dialog>
     </div>
   )
 }

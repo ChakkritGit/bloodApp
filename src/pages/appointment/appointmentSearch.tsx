@@ -81,7 +81,6 @@ const AppointmentSearch = () => {
   })
   const paragraphRef = useRef<HTMLHeadingElement>(null)
   const openImageRef = useRef<HTMLDialogElement>(null)
-
   const [zoom, setZoom] = useState(false)
 
   const formattedThaiDate = appointmentData.f_appdoctorduedate
@@ -174,6 +173,10 @@ const AppointmentSearch = () => {
     }
   }, [])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   return (
     <div className='min-h-screen bg-base-200 p-4'>
       <button
@@ -188,7 +191,7 @@ const AppointmentSearch = () => {
       {!isLoading ? (
         <>
           <div
-            className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-100/60 backdrop-blur-xl shadow-md z-50 select-none transition-all duration-300 ease-in-out ${
+            className={`fixed left-0 top-0 p-2 w-full rounded-b-3xl bg-base-100/30 backdrop-blur-xl shadow-md z-50 select-none transition-all duration-300 ease-in-out ${
               isButtonFixed
                 ? 'translate-y-0 opacity-100'
                 : '-translate-y-full opacity-0'

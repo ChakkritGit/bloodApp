@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   HiCalendarDays,
   HiCog6Tooth,
+  HiHome,
   HiMiniArrowRightStartOnRectangle,
   HiMiniBars3BottomLeft,
   HiMiniMagnifyingGlass,
@@ -18,7 +19,7 @@ const Navbar = () => {
   const confirmModalRef = useRef<ConfirmModalRef>(null)
 
   return (
-    <div className='navbar bg-base-100 rounded-b-3xl shadow-md'>
+    <div className={`navbar ${!location.pathname.startsWith("/appointment/confirm") ? 'bg-base-100/30 backdrop-blur-xl shadow-md rounded-b-xl' : 'bg-base-100'} top-0 left-0 sticky z-50`}>
       <div className='navbar-start'>
         <div className='dropdown'>
           <div tabIndex={0} role='button' className='btn btn-ghost btn-circle'>
@@ -112,9 +113,7 @@ const Navbar = () => {
             ? t('manageUser')
             : location.pathname === '/appointment/setting'
             ? t('manageSetting')
-            : location.pathname.split('/')[
-                location.pathname.split('/').length - 1
-              ] ?? '—'}
+            : <HiHome size={24} />}
         </Link>
       </div>
       <div className='navbar-end'></div>

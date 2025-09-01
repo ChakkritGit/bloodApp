@@ -1,5 +1,5 @@
 import appLogo from '../../assets/images/appLogo.png'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { IoIosClose } from 'react-icons/io'
@@ -56,6 +56,10 @@ const Main = () => {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   return (
     <div className='min-h-screen bg-base-200 h-dvh'>

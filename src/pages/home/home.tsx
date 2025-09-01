@@ -226,6 +226,10 @@ const Home = () => {
     return searchMachine
   }, [appointmentData, statusFilter, search])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   return (
     <div>
       {isLoading ? (

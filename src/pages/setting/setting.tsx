@@ -1,7 +1,11 @@
+import { useEffect } from "react"
+
 const Setting = () => {
-  return (
-    <div>Setting</div>
-  )
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
+  return <div>Setting</div>
 }
 
 export default Setting

@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import { HiEnvelope, HiLockClosed } from 'react-icons/hi2'
 import { IoIosArrowBack } from 'react-icons/io'
 import { useTranslation } from 'react-i18next'
@@ -67,6 +67,10 @@ const Login = () => {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   return (
     <div className='min-h-screen flex flex-col'>
