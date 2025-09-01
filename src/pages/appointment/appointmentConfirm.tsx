@@ -83,24 +83,48 @@ const AppointmentConfirm: FC = () => {
       others: []
     }
   })
+  const [zoom, setZoom] = useState(false)
+  const [takenQueues, setTakenQueues] = useState<TakenQueue[]>([])
   const paragraphRef = useRef<HTMLHeadingElement>(null)
   const openImageRef = useRef<HTMLDialogElement>(null)
-  const [zoom, setZoom] = useState(false)
+  const hiddenDateInputRef = useRef<HTMLInputElement>(null)
+  const hiddenDateInputPatientServiceRef = useRef<HTMLInputElement>(null)
 
-  const [takenQueues, setTakenQueues] = useState<TakenQueue[]>([])
-  const [selectedQueue, setSelectedQueue] = useState<number | null>(null)
+  const handleDateChange = (e: any) => {
+    setAppointmentData({
+      ...appointmentData,
+      f_appadminconfirmvisitedate: e.target.value
+    })
+  }
+
+  const handleDateChangePatientService = (e: any) => {
+    setAppointmentData({
+      ...appointmentData,
+      f_appadminduedate: e.target.value
+    })
+  }
+
+  const handleVisibleInputClick = () => {
+    hiddenDateInputRef.current?.showPicker()
+  }
+
+  const handleVisibleInputPatientServiceClick = () => {
+    hiddenDateInputPatientServiceRef.current?.showPicker()
+  }
 
   useEffect(() => {
     const fetchTakenQueues = async () => {
       try {
-        const mockData: TakenQueue[] = [
-          { f_appidno: '123456785454', f_appadmindueque: 1 },
-          { f_appidno: '123456789012', f_appadmindueque: 5 },
-          { f_appidno: '123456789963', f_appadmindueque: 29 }
-        ]
-        setTakenQueues(mockData)
+        const result = await axios.get<ApiResponse<TakenQueue[]>>(
+          `${import.meta.env.VITE_APP_API}/appointment/queue`
+        )
+        setTakenQueues(result.data.data)
       } catch (error) {
-        console.error('Failed to fetch taken queues', error)
+        if (error instanceof AxiosError) {
+          console.error(error)
+        } else {
+          console.error('Failed to fetch taken queues', error)
+        }
       }
     }
 
@@ -151,21 +175,27 @@ const AppointmentConfirm: FC = () => {
     }
   }
 
-  const formattedThaiDate = appointmentData.f_appdoctorduedate
+  const formattedThaiDateDuedate = appointmentData.f_appdoctorduedate
     ? format(new Date(appointmentData.f_appdoctorduedate), 'd MMMM yyyy', {
         locale: th
       })
     : t('selectDate')
 
-  const formattedThaiServiceDate = appointmentData.f_appadminduedate ? (
-    format(new Date(appointmentData.f_appadminduedate), 'd MMMM yyyy', {
-      locale: th
-    })
-  ) : (
-    <div className='font-medium text-primary'>
-      <IoIosRemove size={32} />
-    </div>
-  )
+  const formattedThaiDate = appointmentData.f_appadminconfirmvisitedate
+    ? format(
+        new Date(appointmentData.f_appadminconfirmvisitedate),
+        'd MMMM yyyy',
+        {
+          locale: th
+        }
+      )
+    : t('selectDate')
+
+  const formattedThaiServiceDate = appointmentData.f_appadminduedate
+    ? format(new Date(appointmentData.f_appadminduedate), 'd MMMM yyyy', {
+        locale: th
+      })
+    : t('selectDate')
 
   const status = getStatusInfo(appointmentData.f_appstepno)
 
@@ -322,12 +352,39 @@ const AppointmentConfirm: FC = () => {
                     <div>
                       <div className='label'>{t('selectQueue')}</div>
                       <div className='flex flex-col items-center font-medium text-base text-primary h-max w-full'>
-
                         <QueueSelector
                           takenQueues={takenQueues}
-                          onQueueSelect={queue => setSelectedQueue(queue)}
+                          onQueueSelect={queue =>
+                            setAppointmentData({
+                              ...appointmentData,
+                              f_appadmindueque: queue as number
+                            })
+                          }
                         />
                       </div>
+                    </div>
+                    <div className='form-control'>
+                      <label className='label'>
+                        <span className='label'>{t('visitDate')}</span>
+                      </label>
+                      <input
+                        type='text'
+                        readOnly
+                        value={formattedThaiDate}
+                        onClick={handleVisibleInputClick}
+                        className='input input-bordered w-full h-13 rounded-3xl border-primary text-primary cursor-pointer'
+                        placeholder='กรุณาเลือกวันที่'
+                      />
+
+                      <input
+                        type='date'
+                        ref={hiddenDateInputRef}
+                        value={
+                          appointmentData.f_appadminconfirmvisitedate as string
+                        }
+                        onChange={handleDateChange}
+                        className='hidden'
+                      />
                     </div>
                   </div>
                 </section>
@@ -368,17 +425,32 @@ const AppointmentConfirm: FC = () => {
                         </span>
                       </label>
                       <div className='inline-flex items-center font-medium text-base h-10 w-full'>
-                        {formattedThaiDate}
+                        {formattedThaiDateDuedate}
                       </div>
                     </div>
+
                     <div className='form-control'>
                       <label className='label'>
                         <span className='label'>{t('serviceDate')}</span>
                       </label>
-                      <div className='inline-flex items-center font-medium text-base h-10 w-full'>
-                        {formattedThaiServiceDate}
-                      </div>
+                      <input
+                        type='text'
+                        readOnly
+                        value={formattedThaiServiceDate}
+                        onClick={handleVisibleInputPatientServiceClick}
+                        className='input input-bordered w-full h-13 rounded-3xl border-primary text-primary cursor-pointer'
+                        placeholder='กรุณาเลือกวันที่'
+                      />
+
+                      <input
+                        type='date'
+                        ref={hiddenDateInputPatientServiceRef}
+                        value={appointmentData.f_appadminduedate as string}
+                        onChange={handleDateChangePatientService}
+                        className='hidden'
+                      />
                     </div>
+
                     <div className='form-control'>
                       <label className='label'>
                         <span className='label'>{t('contactNumber')} 1</span>
@@ -403,6 +475,23 @@ const AppointmentConfirm: FC = () => {
                         {appointmentData.f_appcreatecontactaddress}
                       </div>
                     </div>
+                  </div>
+                  <div className='form-control'>
+                    <label className='label'>
+                      <span className='label'>{t('confirmAdmin')}</span>
+                    </label>
+                    <input
+                      type='text'
+                      placeholder={t('patientProveInfoByName')}
+                      value={appointmentData.f_apppatientproveinfobyname as string}
+                      onChange={e =>
+                        setAppointmentData({
+                          ...appointmentData,
+                          f_apppatientproveinfobyname: e.target.value
+                        })
+                      }
+                      className='input input-bordered h-13 w-full border-primary text-primary rounded-3xl'
+                    />
                   </div>
                 </section>
 

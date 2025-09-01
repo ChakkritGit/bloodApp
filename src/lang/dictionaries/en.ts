@@ -65,6 +65,9 @@ export default {
     cancelQueue: 'Cancel queue',
     cancelQueueDescription: 'Do you want to cancel the queue?',
     okButton: 'Ok',
-    selectQueue: 'Select queue'
+    selectQueue: 'Select queue',
+    visitDate: 'Patient service time',
+    confirmAdmin: 'Confirm by',
+    patientProveInfoByName: 'Patient prove info by name'
   }
 }

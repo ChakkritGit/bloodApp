@@ -65,6 +65,9 @@ export default {
     cancelQueue: 'ยกเลิกคิว',
     cancelQueueDescription: 'คุณต้องการยกเลิกคิวหรือไม่',
     okButton: 'ตกลง',
-    selectQueue: 'เลือกคิว'
+    selectQueue: 'เลือกคิว',
+    visitDate: 'เวลาที่เข้าบริการให้ผู้ป่วย',
+    confirmAdmin: 'ผู้ดำเนินการ',
+    patientProveInfoByName: 'ชื่อผู้เข้าบริการผู้ป่วย'
   }
 }

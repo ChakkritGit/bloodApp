@@ -297,7 +297,24 @@ const AppointmentSearch = () => {
                       <div className='label'>{t('queueNumber')}</div>
                       <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
                         {appointmentData.f_appadminduequemax ? (
-                          `${appointmentData.f_appadminduequemax} / 30`
+                          <div className='flex flex-col'>
+                            <span>
+                              {appointmentData.f_appadminduequemax}
+                            </span>
+                            <span className='text-sm'>
+                              {appointmentData.f_appadminconfirmvisitedate
+                                ? format(
+                                    new Date(
+                                      appointmentData.f_appadminconfirmvisitedate
+                                    ),
+                                    'd MMMM yyyy',
+                                    {
+                                      locale: th
+                                    }
+                                  )
+                                : '—'}
+                            </span>
+                          </div>
                         ) : (
                           <IoIosRemove size={32} />
                         )}

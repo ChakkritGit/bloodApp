@@ -36,7 +36,7 @@ const QueueSelector: FC<QueueSelectorProps> = ({
 
   return (
     <div className='w-full'>
-      <div className='grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-2 px-1 py-4'>
+      <div className='grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-2 px-1 py-3'>
         {allQueues.map(queueNumber => {
           const isTaken = takenQueueSet.has(queueNumber)
           const isSelected = selectedQueue === queueNumber
