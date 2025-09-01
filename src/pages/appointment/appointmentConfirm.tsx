@@ -904,6 +904,10 @@ const AppointmentConfirm: FC = () => {
                                   src={slip.slipPreview}
                                   alt='Preview'
                                   className='w-full h-full object-cover rounded-3xl'
+                                  onClick={() => {
+                                    setOpnemImage(slip.slipPreview)
+                                    openImageRef.current?.showModal()
+                                  }}
                                 />
                                 <button
                                   onClick={handleRemoveSlipImage}
