@@ -12,6 +12,7 @@ export default {
 
     appointmentAddHeadTitle: 'บันทึกใบนัดหมาย',
     appointmentViewHeadTitle: 'รายละเอียดใบนัดหมาย',
+    appointmentConfirmHeadTitle: 'คอนเฟิร์มใบนัดหมาย',
     appointmentNumber: 'เลขที่ใบนัด',
 
     detailStatus: 'ข้อมูลสถานะ',
@@ -63,6 +64,7 @@ export default {
     viewAndEdit: 'ดู/แก้ไข',
     cancelQueue: 'ยกเลิกคิว',
     cancelQueueDescription: 'คุณต้องการยกเลิกคิวหรือไม่',
-    okButton: 'ตกลง'
+    okButton: 'ตกลง',
+    selectQueue: 'เลือกคิว'
   }
 }

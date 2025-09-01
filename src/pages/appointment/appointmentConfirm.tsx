@@ -10,11 +10,15 @@ import LocationMap from '../../utils/LocationMap'
 import { IoIosArrowBack, IoIosRemove } from 'react-icons/io'
 import { ApiResponse } from '../../types/api.response.type'
 import axios, { AxiosError } from 'axios'
+import { useSelector } from 'react-redux'
+import { RootState } from '../../redux/reducers/rootReducer'
+import QueueSelector, { TakenQueue } from './queueSelect'
 
 const AppointmentConfirm: FC = () => {
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
+  const { cookieDecode } = useSelector((state: RootState) => state.utils)
   const [isButtonFixed, setIsButtonFixed] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [openImage, setOpnemImage] = useState('')
@@ -82,6 +86,26 @@ const AppointmentConfirm: FC = () => {
   const paragraphRef = useRef<HTMLHeadingElement>(null)
   const openImageRef = useRef<HTMLDialogElement>(null)
   const [zoom, setZoom] = useState(false)
+
+  const [takenQueues, setTakenQueues] = useState<TakenQueue[]>([])
+  const [selectedQueue, setSelectedQueue] = useState<number | null>(null)
+
+  useEffect(() => {
+    const fetchTakenQueues = async () => {
+      try {
+        const mockData: TakenQueue[] = [
+          { f_appidno: '123456785454', f_appadmindueque: 1 },
+          { f_appidno: '123456789012', f_appadmindueque: 5 },
+          { f_appidno: '123456789963', f_appadmindueque: 29 }
+        ]
+        setTakenQueues(mockData)
+      } catch (error) {
+        console.error('Failed to fetch taken queues', error)
+      }
+    }
+
+    fetchTakenQueues()
+  }, [])
 
   const fetchAppointment = async () => {
     setIsLoading(true)
@@ -237,7 +261,7 @@ const AppointmentConfirm: FC = () => {
               }`}
             >
               <h1 className='text-3xl font-bold'>
-                {t('appointmentViewHeadTitle')}
+                {t('appointmentConfirmHeadTitle')}
               </h1>
               <p className='label font-medium mt-3'>{t('appointmentNumber')}</p>
               <h2
@@ -270,12 +294,10 @@ const AppointmentConfirm: FC = () => {
                     </div>
                     <div>
                       <div className='label'>{t('confirmedBy')}</div>
-                      <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
-                        {appointmentData.f_appcreateconfirmname ? (
+                      <div className='inline-flex items-center font-medium text-base text-primary h-15 w-full'>
+                        {cookieDecode?.f_userfullname ? (
                           <div className='flex flex-col'>
-                            <span>
-                              {appointmentData.f_appcreateconfirmname}
-                            </span>
+                            <span>{cookieDecode?.f_userfullname}</span>
                             <span className='text-sm'>
                               {appointmentData.f_appcreateconfirmdatetime
                                 ? format(
@@ -287,7 +309,9 @@ const AppointmentConfirm: FC = () => {
                                       locale: th
                                     }
                                   )
-                                : '—'}
+                                : format(new Date(new Date()), 'd MMMM yyyy', {
+                                    locale: th
+                                  })}
                             </span>
                           </div>
                         ) : (
@@ -296,13 +320,13 @@ const AppointmentConfirm: FC = () => {
                       </div>
                     </div>
                     <div>
-                      <div className='label'>{t('queueNumber')}</div>
-                      <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
-                        {appointmentData.f_appadminduequemax ? (
-                          `${appointmentData.f_appadminduequemax} / 30`
-                        ) : (
-                          <IoIosRemove size={32} />
-                        )}
+                      <div className='label'>{t('selectQueue')}</div>
+                      <div className='flex flex-col items-center font-medium text-base text-primary h-max w-full'>
+
+                        <QueueSelector
+                          takenQueues={takenQueues}
+                          onQueueSelect={queue => setSelectedQueue(queue)}
+                        />
                       </div>
                     </div>
                   </div>

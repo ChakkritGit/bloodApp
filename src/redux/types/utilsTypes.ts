@@ -1,4 +1,4 @@
-import { CookieDecode } from "../../pages/types/cookie.type"
+import { CookieDecode } from "../../types/cookie.type"
 import { TokenDecode } from "../../types/token.type"
 
 const COOKIE_ENCODE = 'COOKIE_ENCODE'

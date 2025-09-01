@@ -13,7 +13,7 @@ import {
   setCookieDecode,
   setCookieEncode
 } from '../../redux/actions/utilsActions'
-import { CookieDecode } from '../../pages/types/cookie.type'
+import { CookieDecode } from '../../types/cookie.type'
 
 type AuthProps = {
   children: ReactElement

@@ -109,21 +109,21 @@ const AppointmentSearch = () => {
   const getStatusInfo = (step: number): { text: string; className: string } => {
     switch (step) {
       case 1:
-        return { text: 'รอพิจารณาและยืนยันรายการ', className: 'text-amber-400' }
+        return { text: t('stepAppOne'), className: 'text-amber-400' }
       case 2:
         return {
-          text: 'ยืนยันรายการและวันนัดหมายแล้ว',
+          text: t('stepAppTwo'),
           className: 'text-green-400'
         }
       case 3:
         return {
-          text: 'เตรียมการและเอกสารเพื่อเข้าตรวจตามนัด',
+          text: t('stepAppThree'),
           className: 'text-blue-400'
         }
       case 4:
-        return { text: 'เข้าดำเนินการตรวจแล้ว', className: 'text-purple-400' }
+        return { text: t('stepAppFour'), className: 'text-purple-400' }
       case 5:
-        return { text: 'ยกเลิกการนัดหมาย', className: 'text-red-400' }
+        return { text: t('stepAppFri'), className: 'text-red-400' }
       default:
         return { text: 'ไม่ระบุสถานะ', className: 'text-ghost' }
     }

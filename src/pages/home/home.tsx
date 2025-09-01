@@ -249,7 +249,7 @@ const Home = () => {
               />
               {search.length > 0 && (
                 <span
-                  className='kbd kbd-md cursor-pointer'
+                  className='kbd rounded-3xl p-0 h-8 w-10 cursor-pointer'
                   onClick={() => setSearch('')}
                 >
                   <BiX size={24} />

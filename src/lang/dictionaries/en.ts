@@ -12,6 +12,7 @@ export default {
 
     appointmentAddHeadTitle: 'Save appointment',
     appointmentViewHeadTitle: 'Appointment details',
+    appointmentConfirmHeadTitle: 'Appointment confirm',
     appointmentNumber: 'Appointment No',
 
     detailStatus: 'Details status',
@@ -63,6 +64,7 @@ export default {
     viewAndEdit: 'View/Edit',
     cancelQueue: 'Cancel queue',
     cancelQueueDescription: 'Do you want to cancel the queue?',
-    okButton: 'Ok'
+    okButton: 'Ok',
+    selectQueue: 'Select queue'
   }
 }
