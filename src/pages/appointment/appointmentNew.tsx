@@ -474,7 +474,7 @@ const AppointmentNew = () => {
                     ) : !isImageResizing ? (
                       <label
                         htmlFor='imageUploader'
-                        className='w-full h-full md:h-full border-2 border-dashed rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'
+                        className='w-full h-full md:h-full border-2 border-dashed border-base-content rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'
                       >
                         <HiPhoto
                           size={40}
@@ -503,7 +503,7 @@ const AppointmentNew = () => {
                         lon={parseFloat(appointmentData.f_appcreatecontactlon)}
                       />
                     ) : (
-                      <div className='w-full h-full md:h-full border-2 border-dashed rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
+                      <div className='w-full h-full md:h-full border-2 border-dashed border-base-content rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
                         <HiMapPin
                           size={40}
                           className='text-base-content/50 mb-2'

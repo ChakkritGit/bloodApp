@@ -14,7 +14,7 @@ import { useSelector } from 'react-redux'
 import { RootState } from '../../redux/reducers/rootReducer'
 import QueueSelector, { TakenQueue } from './queueSelect'
 import { showToast } from '../../utils/toast'
-import { BiError } from 'react-icons/bi'
+import { BiCheck, BiError } from 'react-icons/bi'
 import { resizeImage } from '../../constants/utils/image'
 
 const AppointmentConfirm: FC = () => {
@@ -339,7 +339,33 @@ const AppointmentConfirm: FC = () => {
     }
   }
 
-  const handleSubmit = async () => {}
+  const handleSubmit = async () => {
+    try {
+      console.table(appointmentData)
+      // showToast({
+      //   type: 'success',
+      //   icon: BiCheck,
+      //   message: result.data.message,
+      //   duration: 3000,
+      //   showClose: false
+      // })
+      // navigate(`/appointment`, {
+      //   replace: true
+      // })
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        showToast({
+          type: 'error',
+          icon: BiError,
+          message: error.response?.data.message,
+          duration: error.response?.data.message.length > 27 ? 10000 : 1800,
+          showClose: true
+        })
+      } else {
+        console.error(error)
+      }
+    }
+  }
 
   const getStatusInfo = (step: number): { text: string; className: string } => {
     switch (step) {
@@ -588,7 +614,7 @@ const AppointmentConfirm: FC = () => {
                         type='date'
                         ref={hiddenDateInputRef}
                         value={
-                          appointmentData.f_appadminconfirmvisitedate as string
+                          appointmentData.f_appadminconfirmvisitedate ?? ''
                         }
                         onChange={handleDateChange}
                         className='hidden'
@@ -653,7 +679,7 @@ const AppointmentConfirm: FC = () => {
                       <input
                         type='date'
                         ref={hiddenDateInputPatientServiceRef}
-                        value={appointmentData.f_appadminduedate as string}
+                        value={appointmentData.f_appadminduedate ?? ''}
                         onChange={handleDateChangePatientService}
                         className='hidden'
                       />
@@ -693,7 +719,7 @@ const AppointmentConfirm: FC = () => {
                       placeholder={t('patientProveInfoByName')}
                       className='input input-bordered w-full h-13 rounded-3xl border-primary text-primary'
                       value={
-                        appointmentData.f_apppatientproveinfobyname as string
+                        appointmentData.f_apppatientproveinfobyname ?? ''
                       }
                       onChange={e =>
                         setAppointmentData({
@@ -1031,14 +1057,14 @@ const AppointmentConfirm: FC = () => {
             </button>
           </form>
           <div className='mt-12 max-h-[70dvh] overflow-auto flex items-start justify-center'>
-            <img
+            {openImage && <img
               src={openImage}
               alt='Preview'
               onClick={() => setZoom(!zoom)}
               className={`rounded-3xl object-contain transition-transform duration-300 cursor-zoom-in ${
                 zoom ? 'scale-200 cursor-zoom-out' : 'scale-100'
               }`}
-            />
+            />}
           </div>
         </div>
       </dialog>
