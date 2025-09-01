@@ -26,6 +26,7 @@ const Navbar = () => {
   const location = useLocation()
   const confirmModalRef = useRef<ConfirmModalRef>(null)
   const [toggleLang, setToggleLang] = useState(false)
+  const dropdownLangRef = useRef<HTMLUListElement>(null)
 
   const setLang = (lang: string) => {
     dispatch(setLanguage(lang))
@@ -99,7 +100,10 @@ const Navbar = () => {
               </Link>
             </li>
             <div className='divider my-0'></div>
-            <li className='dropdown dropdown-end w-full'>
+            <li
+              className='dropdown dropdown-end w-full'
+              onBlur={() => setToggleLang(!toggleLang)}
+            >
               <button
                 className='btn rounded-3xl w-full'
                 popoverTarget='popover-1'
@@ -118,8 +122,14 @@ const Navbar = () => {
                 className='dropdown menu min-w-42 rounded-[34px] bg-base-300 shadow-sm p-2.5 flex gap-1.5'
                 popover='auto'
                 id='popover-1'
+                ref={dropdownLangRef}
               >
-                <li onClick={() => setLang('th')}>
+                <li
+                  onClick={() => {
+                    setLang('th')
+                    dropdownLangRef.current?.hidePopover?.()
+                  }}
+                >
                   <a
                     className={`flex flex-row gap-2 h-11 w-full rounded-3xl ${
                       currentLang === 'th' ? 'bg-primary text-neutral' : ''
@@ -129,7 +139,12 @@ const Navbar = () => {
                     <span>ไทย</span>
                   </a>
                 </li>
-                <li onClick={() => setLang('en')}>
+                <li
+                  onClick={() => {
+                    setLang('en')
+                    dropdownLangRef.current?.hidePopover?.()
+                  }}
+                >
                   <a
                     className={`flex flex-row gap-2 h-11 w-full rounded-3xl ${
                       currentLang === 'en' ? 'bg-primary text-neutral' : ''

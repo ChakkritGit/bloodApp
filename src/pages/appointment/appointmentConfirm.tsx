@@ -97,7 +97,12 @@ const AppointmentConfirm: FC = () => {
   const [testListPreviews, setTestListPreviews] = useState<string[]>([])
   const [isTestListResizing, setIsTestListResizing] = useState<boolean>(false)
 
+  const [bloodListFiles, setBloodListFiles] = useState<File[]>([])
+  const [bloodListPreviews, setBloodListPreviews] = useState<string[]>([])
+  const [isBloodListResizing, setIsBloodListResizing] = useState<boolean>(false)
+
   const testListFileInputRef = useRef<HTMLInputElement>(null)
+  const bloodListFileInputRef = useRef<HTMLInputElement>(null)
 
   const handleMultiImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files
@@ -154,6 +159,63 @@ const AppointmentConfirm: FC = () => {
     }
   }
 
+  const handleBloodMultiImageChange = async (
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    const selectedFiles = e.target.files
+    if (!selectedFiles || selectedFiles.length === 0) return
+
+    const MAX_FILES = 10
+    const filesArray = Array.from(selectedFiles)
+
+    if (bloodListFiles.length + filesArray.length > MAX_FILES) {
+      showToast({
+        type: 'error',
+        icon: BiError,
+        message: `สามารถเลือกรูปภาพได้สูงสุด ${MAX_FILES} รูป`,
+        duration: 3000
+      })
+      return
+    }
+
+    for (const file of filesArray) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast({
+          type: 'error',
+          icon: BiError,
+          message: t('imageSizeLimit'),
+          duration: 3000
+        })
+        return
+      }
+    }
+
+    setIsBloodListResizing(true)
+    try {
+      const resizePromises = filesArray.map(file => resizeImage(file))
+      const resizedFiles = await Promise.all(resizePromises)
+
+      setBloodListFiles(prevFiles => [...resizedFiles, ...prevFiles])
+
+      const newPreviews = resizedFiles.map(file => URL.createObjectURL(file))
+      setBloodListPreviews(prevPreviews => [...newPreviews, ...prevPreviews])
+    } catch (error) {
+      console.error('Image resize failed:', error)
+      showToast({
+        type: 'error',
+        icon: BiError,
+        message: 'เกิดข้อผิดพลาดขณะย่อขนาดรูปภาพ',
+        duration: 3000
+      })
+    } finally {
+      setIsBloodListResizing(false)
+
+      if (bloodListFileInputRef.current) {
+        bloodListFileInputRef.current.value = ''
+      }
+    }
+  }
+
   const handleRemoveImage = (indexToRemove: number) => {
     URL.revokeObjectURL(testListPreviews[indexToRemove])
 
@@ -164,6 +226,21 @@ const AppointmentConfirm: FC = () => {
 
     if (testListFileInputRef.current) {
       testListFileInputRef.current.value = ''
+    }
+  }
+
+  const handleBloodRemoveImage = (indexToRemove: number) => {
+    URL.revokeObjectURL(testListPreviews[indexToRemove])
+
+    setBloodListFiles(prev =>
+      prev.filter((_, index) => index !== indexToRemove)
+    )
+    setBloodListPreviews(prev =>
+      prev.filter((_, index) => index !== indexToRemove)
+    )
+
+    if (bloodListFileInputRef.current) {
+      bloodListFileInputRef.current.value = ''
     }
   }
 
@@ -237,7 +314,7 @@ const AppointmentConfirm: FC = () => {
     ? format(new Date(appointmentData.f_appdoctorduedate), 'd MMMM yyyy', {
         locale: th
       })
-    : t('selectDate')
+    : ''
 
   const formattedThaiDate = appointmentData.f_appadminconfirmvisitedate
     ? format(
@@ -247,13 +324,13 @@ const AppointmentConfirm: FC = () => {
           locale: th
         }
       )
-    : t('selectDate')
+    : ''
 
   const formattedThaiServiceDate = appointmentData.f_appadminduedate
     ? format(new Date(appointmentData.f_appadminduedate), 'd MMMM yyyy', {
         locale: th
       })
-    : t('selectDate')
+    : ''
 
   const status = getStatusInfo(appointmentData.f_appstepno)
 
@@ -560,6 +637,7 @@ const AppointmentConfirm: FC = () => {
                     <input
                       type='text'
                       placeholder={t('patientProveInfoByName')}
+                      className='input input-bordered w-full h-13 rounded-3xl border-primary text-primary'
                       value={
                         appointmentData.f_apppatientproveinfobyname as string
                       }
@@ -569,7 +647,6 @@ const AppointmentConfirm: FC = () => {
                           f_apppatientproveinfobyname: e.target.value
                         })
                       }
-                      className='input input-bordered h-13 w-full border-primary text-primary rounded-3xl'
                     />
                   </div>
                 </section>
@@ -689,42 +766,66 @@ const AppointmentConfirm: FC = () => {
                         <span className='label'>{t('bloodTubsImage')}</span>
                       </label>
 
-                      <div className='w-full h-52 md:h-84 mt-3 relative'>
-                        {appointmentData.files?.bloodTubes.length > 0 ? (
-                          <div className='flex gap-3 overflow-x-auto h-full pr-10 rounded-3xl'>
-                            {appointmentData.files?.bloodTubes.map(
-                              (img, index) => (
-                                <div
-                                  key={index}
-                                  className='flex-shrink-0 w-52 h-full rounded-3xl cursor-pointer hover:opacity-90 transition-opacity duration-300 ease-in-out'
-                                  onClick={() => {
-                                    setOpnemImage(
-                                      import.meta.env.VITE_APP_IMG +
-                                        img.f_appimageidpart
-                                    )
-                                    openImageRef.current?.showModal()
-                                  }}
-                                >
-                                  <img
-                                    src={
-                                      import.meta.env.VITE_APP_IMG +
-                                      img.f_appimageidpart
-                                    }
-                                    alt='Preview'
-                                    className='w-full h-full object-cover rounded-3xl'
-                                  />
-                                </div>
-                              )
-                            )}
-                          </div>
-                        ) : (
-                          <label className='w-full h-full md:h-full rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
-                            <HiPhoto
-                              size={40}
-                              className='text-base-content/50 mb-2'
-                            />
-                          </label>
-                        )}
+                      <div className='w-full min-h-[13rem] mt-3 relative'>
+                        <input
+                          type='file'
+                          accept='image/*'
+                          multiple
+                          ref={bloodListFileInputRef}
+                          onChange={handleBloodMultiImageChange}
+                          className='hidden'
+                          id='testListImageUploader'
+                        />
+
+                        <div className='flex gap-3 overflow-x-auto h-full p-2 bg-base-200 rounded-3xl'>
+                          {bloodListFiles.length < 10 && (
+                            <div
+                              className={`flex-shrink-0 ${
+                                bloodListFiles.length === 0 ? 'w-full' : 'w-32'
+                              } h-44 rounded-2xl cursor-pointer transition-colors`}
+                              onClick={() =>
+                                bloodListFileInputRef.current?.click()
+                              }
+                            >
+                              <div className='w-full h-full flex items-center justify-center bg-base-100 hover:bg-base-300/50 rounded-2xl border-2 border-dashed'>
+                                {isBloodListResizing ? (
+                                  <span className='loading loading-spinner'></span>
+                                ) : (
+                                  <div className='flex flex-col items-center text-base-content/50'>
+                                    <HiPlus size={32} />
+                                    <span className='text-xs mt-1'>
+                                      {t('addImage')}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {bloodListPreviews.map((previewUrl, index) => (
+                            <div
+                              key={index}
+                              className='flex-shrink-0 w-32 h-44 rounded-2xl relative group'
+                            >
+                              <img
+                                src={previewUrl}
+                                alt={`Preview ${index + 1}`}
+                                className='w-full h-full object-cover rounded-2xl'
+                                onClick={() => {
+                                  setOpnemImage(previewUrl)
+                                  openImageRef.current?.showModal()
+                                }}
+                              />
+                              <button
+                                type='button'
+                                onClick={() => handleBloodRemoveImage(index)}
+                                className='btn bg-black/30 text-white btn-circle btn-sm border-0 shadow-none absolute top-2 right-2'
+                              >
+                                <IoIosClose size={24} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                       <label className='label'>
