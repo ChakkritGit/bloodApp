@@ -68,6 +68,7 @@ export default {
     selectQueue: 'เลือกคิว',
     visitDate: 'เวลาที่เข้าบริการให้ผู้ป่วย',
     confirmAdmin: 'ผู้ดำเนินการ',
-    patientProveInfoByName: 'ชื่อผู้เข้าบริการผู้ป่วย'
+    patientProveInfoByName: 'ชื่อผู้เข้าบริการผู้ป่วย',
+    addImage: 'เพิ่มรูปภาพ'
   }
 }

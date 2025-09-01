@@ -146,7 +146,7 @@ const AppointmentNew = () => {
           type: 'error',
           icon: BiError,
           message: t('imageSizeLimit'),
-          duration: 1800,
+          duration: 2000,
           showClose: false
         }).finally(async () => {
           setAppointmentData({
@@ -465,7 +465,7 @@ const AppointmentNew = () => {
                         />
                         <button
                           onClick={handleRemoveImage}
-                          className='btn bg-black/30 text-base-100 btn-circle btn-sm border-0 shadow-none absolute top-3 right-3'
+                          className='btn bg-black/30 text-white btn-circle btn-sm border-0 shadow-none absolute top-3 right-3'
                           aria-label='Remove image'
                         >
                           <IoIosClose size={24} />

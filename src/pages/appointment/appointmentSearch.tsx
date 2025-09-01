@@ -630,7 +630,7 @@ const AppointmentSearch = () => {
               <HiMiniXMark size={32} />
             </button>
           </form>
-          <div className='mt-12 max-h-[70vh] overflow-auto flex justify-center'>
+          <div className='mt-12 max-h-[70dvh] overflow-auto flex items-start justify-center'>
             <img
               src={openImage}
               alt='Preview'

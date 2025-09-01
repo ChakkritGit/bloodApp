@@ -29,7 +29,7 @@ export default {
     contactNumber: 'Contact Number',
     serviceLocation: 'Service Location',
     mapAndAttachments: 'Map and Attachments',
-    appointmentSlipImage: 'Appointment Slip Image',
+    appointmentSlipImage: 'Appointment Doc Image',
     uploadImage: 'Tap to Upload Image',
     getLocation: 'Tap Here to Get Location',
     noLocation: 'No Location Available',
@@ -68,6 +68,7 @@ export default {
     selectQueue: 'Select queue',
     visitDate: 'Patient service time',
     confirmAdmin: 'Confirm by',
-    patientProveInfoByName: 'Patient prove info by name'
+    patientProveInfoByName: 'Patient prove info by name',
+    addImage: 'Add image'
   }
 }

@@ -1,18 +1,21 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Appointment } from '../../types/appointment.type'
 import { delay } from '../../constants/utils/utilsConstants'
-import { HiMapPin, HiMiniXMark, HiPhoto } from 'react-icons/hi2'
+import { HiMapPin, HiMiniXMark, HiPhoto, HiPlus } from 'react-icons/hi2'
 import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
 import LocationMap from '../../utils/LocationMap'
-import { IoIosArrowBack, IoIosRemove } from 'react-icons/io'
+import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
 import { ApiResponse } from '../../types/api.response.type'
 import axios, { AxiosError } from 'axios'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../redux/reducers/rootReducer'
 import QueueSelector, { TakenQueue } from './queueSelect'
+import { showToast } from '../../utils/toast'
+import { BiError } from 'react-icons/bi'
+import { resizeImage } from '../../constants/utils/image'
 
 const AppointmentConfirm: FC = () => {
   const { t } = useTranslation()
@@ -90,6 +93,80 @@ const AppointmentConfirm: FC = () => {
   const hiddenDateInputRef = useRef<HTMLInputElement>(null)
   const hiddenDateInputPatientServiceRef = useRef<HTMLInputElement>(null)
 
+  const [testListFiles, setTestListFiles] = useState<File[]>([])
+  const [testListPreviews, setTestListPreviews] = useState<string[]>([])
+  const [isTestListResizing, setIsTestListResizing] = useState<boolean>(false)
+
+  const testListFileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleMultiImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files
+    if (!selectedFiles || selectedFiles.length === 0) return
+
+    const MAX_FILES = 10
+    const filesArray = Array.from(selectedFiles)
+
+    if (testListFiles.length + filesArray.length > MAX_FILES) {
+      showToast({
+        type: 'error',
+        icon: BiError,
+        message: `สามารถเลือกรูปภาพได้สูงสุด ${MAX_FILES} รูป`,
+        duration: 3000
+      })
+      return
+    }
+
+    for (const file of filesArray) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast({
+          type: 'error',
+          icon: BiError,
+          message: t('imageSizeLimit'),
+          duration: 3000
+        })
+        return
+      }
+    }
+
+    setIsTestListResizing(true)
+    try {
+      const resizePromises = filesArray.map(file => resizeImage(file))
+      const resizedFiles = await Promise.all(resizePromises)
+
+      setTestListFiles(prevFiles => [...resizedFiles, ...prevFiles])
+
+      const newPreviews = resizedFiles.map(file => URL.createObjectURL(file))
+      setTestListPreviews(prevPreviews => [...newPreviews, ...prevPreviews])
+    } catch (error) {
+      console.error('Image resize failed:', error)
+      showToast({
+        type: 'error',
+        icon: BiError,
+        message: 'เกิดข้อผิดพลาดขณะย่อขนาดรูปภาพ',
+        duration: 3000
+      })
+    } finally {
+      setIsTestListResizing(false)
+
+      if (testListFileInputRef.current) {
+        testListFileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const handleRemoveImage = (indexToRemove: number) => {
+    URL.revokeObjectURL(testListPreviews[indexToRemove])
+
+    setTestListFiles(prev => prev.filter((_, index) => index !== indexToRemove))
+    setTestListPreviews(prev =>
+      prev.filter((_, index) => index !== indexToRemove)
+    )
+
+    if (testListFileInputRef.current) {
+      testListFileInputRef.current.value = ''
+    }
+  }
+
   const handleDateChange = (e: any) => {
     setAppointmentData({
       ...appointmentData,
@@ -111,25 +188,6 @@ const AppointmentConfirm: FC = () => {
   const handleVisibleInputPatientServiceClick = () => {
     hiddenDateInputPatientServiceRef.current?.showPicker()
   }
-
-  useEffect(() => {
-    const fetchTakenQueues = async () => {
-      try {
-        const result = await axios.get<ApiResponse<TakenQueue[]>>(
-          `${import.meta.env.VITE_APP_API}/appointment/queue`
-        )
-        setTakenQueues(result.data.data)
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error(error)
-        } else {
-          console.error('Failed to fetch taken queues', error)
-        }
-      }
-    }
-
-    fetchTakenQueues()
-  }, [])
 
   const fetchAppointment = async () => {
     setIsLoading(true)
@@ -231,6 +289,25 @@ const AppointmentConfirm: FC = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
+  useEffect(() => {
+    const fetchTakenQueues = async () => {
+      try {
+        const result = await axios.get<ApiResponse<TakenQueue[]>>(
+          `${import.meta.env.VITE_APP_API}/appointment/queue`
+        )
+        setTakenQueues(result.data.data)
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.error(error)
+        } else {
+          console.error('Failed to fetch taken queues', error)
+        }
+      }
+    }
+
+    fetchTakenQueues()
   }, [])
 
   return (
@@ -483,7 +560,9 @@ const AppointmentConfirm: FC = () => {
                     <input
                       type='text'
                       placeholder={t('patientProveInfoByName')}
-                      value={appointmentData.f_apppatientproveinfobyname as string}
+                      value={
+                        appointmentData.f_apppatientproveinfobyname as string
+                      }
                       onChange={e =>
                         setAppointmentData({
                           ...appointmentData,
@@ -544,42 +623,66 @@ const AppointmentConfirm: FC = () => {
                         <span className='label'>{t('testListImage')}</span>
                       </label>
 
-                      <div className='w-full h-52 md:h-84 mt-3 relative'>
-                        {appointmentData.files?.testListDocs.length > 0 ? (
-                          <div className='flex gap-3 overflow-x-auto h-full pr-10 rounded-3xl'>
-                            {appointmentData.files?.testListDocs.map(
-                              (img, index) => (
-                                <div
-                                  key={index}
-                                  className='flex-shrink-0 w-52 h-full rounded-3xl cursor-pointer hover:opacity-90 transition-opacity duration-300 ease-in-out'
-                                  onClick={() => {
-                                    setOpnemImage(
-                                      import.meta.env.VITE_APP_IMG +
-                                        img.f_appimageidpart
-                                    )
-                                    openImageRef.current?.showModal()
-                                  }}
-                                >
-                                  <img
-                                    src={
-                                      import.meta.env.VITE_APP_IMG +
-                                      img.f_appimageidpart
-                                    }
-                                    alt='Preview'
-                                    className='w-full h-full object-cover rounded-3xl'
-                                  />
-                                </div>
-                              )
-                            )}
-                          </div>
-                        ) : (
-                          <label className='w-full h-full md:h-full rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
-                            <HiPhoto
-                              size={40}
-                              className='text-base-content/50 mb-2'
-                            />
-                          </label>
-                        )}
+                      <div className='w-full min-h-[13rem] mt-3 relative'>
+                        <input
+                          type='file'
+                          accept='image/*'
+                          multiple
+                          ref={testListFileInputRef}
+                          onChange={handleMultiImageChange}
+                          className='hidden'
+                          id='testListImageUploader'
+                        />
+
+                        <div className='flex gap-3 overflow-x-auto h-full p-2 bg-base-200 rounded-3xl'>
+                          {testListFiles.length < 10 && (
+                            <div
+                              className={`flex-shrink-0 ${
+                                testListFiles.length === 0 ? 'w-full' : 'w-32'
+                              } h-44 rounded-2xl cursor-pointer transition-colors`}
+                              onClick={() =>
+                                testListFileInputRef.current?.click()
+                              }
+                            >
+                              <div className='w-full h-full flex items-center justify-center bg-base-100 hover:bg-base-300/50 rounded-2xl border-2 border-dashed'>
+                                {isTestListResizing ? (
+                                  <span className='loading loading-spinner'></span>
+                                ) : (
+                                  <div className='flex flex-col items-center text-base-content/50'>
+                                    <HiPlus size={32} />
+                                    <span className='text-xs mt-1'>
+                                      {t('addImage')}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {testListPreviews.map((previewUrl, index) => (
+                            <div
+                              key={index}
+                              className='flex-shrink-0 w-32 h-44 rounded-2xl relative group'
+                            >
+                              <img
+                                src={previewUrl}
+                                alt={`Preview ${index + 1}`}
+                                className='w-full h-full object-cover rounded-2xl'
+                                onClick={() => {
+                                  setOpnemImage(previewUrl)
+                                  openImageRef.current?.showModal()
+                                }}
+                              />
+                              <button
+                                type='button'
+                                onClick={() => handleRemoveImage(index)}
+                                className='btn bg-black/30 text-white btn-circle btn-sm border-0 shadow-none absolute top-2 right-2'
+                              >
+                                <IoIosClose size={24} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                       <label className='label mt-3'>
@@ -746,12 +849,12 @@ const AppointmentConfirm: FC = () => {
               <HiMiniXMark size={32} />
             </button>
           </form>
-          <div className='mt-12 max-h-[70vh] overflow-auto flex justify-center'>
+          <div className='mt-12 max-h-[70dvh] overflow-auto flex items-start justify-center'>
             <img
               src={openImage}
               alt='Preview'
               onClick={() => setZoom(!zoom)}
-              className={`rounded-3xl transition-transform duration-300 cursor-zoom-in ${
+              className={`rounded-3xl object-contain transition-transform duration-300 cursor-zoom-in ${
                 zoom ? 'scale-200 cursor-zoom-out' : 'scale-100'
               }`}
             />
