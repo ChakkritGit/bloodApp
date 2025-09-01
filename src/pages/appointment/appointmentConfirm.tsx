@@ -101,8 +101,51 @@ const AppointmentConfirm: FC = () => {
   const [bloodListPreviews, setBloodListPreviews] = useState<string[]>([])
   const [isBloodListResizing, setIsBloodListResizing] = useState<boolean>(false)
 
+  const [slip, setSlip] = useState({
+    slipFile: null as File | null,
+    slipPreview: ''
+  })
+  const [isSlipResizing, setIsSlipResizing] = useState<boolean>(false)
+
   const testListFileInputRef = useRef<HTMLInputElement>(null)
   const bloodListFileInputRef = useRef<HTMLInputElement>(null)
+  const slipFileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        await showToast({
+          type: 'error',
+          icon: BiError,
+          message: t('imageSizeLimit'),
+          duration: 2000,
+          showClose: false
+        }).finally(async () => {
+          setSlip({
+            ...slip,
+            slipFile: null,
+            slipPreview: ''
+          })
+        })
+        return
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 500))
+      setIsSlipResizing(true)
+      const reSized = await resizeImage(file).finally(() =>
+        setIsSlipResizing(false)
+      )
+      setSlip(prev => ({
+        ...prev,
+        slipFile: reSized,
+        slipPreview: URL.createObjectURL(file)
+      }))
+      if (slipFileInputRef.current) {
+        slipFileInputRef.current.value = ''
+      }
+    }
+  }
 
   const handleMultiImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files
@@ -213,6 +256,17 @@ const AppointmentConfirm: FC = () => {
       if (bloodListFileInputRef.current) {
         bloodListFileInputRef.current.value = ''
       }
+    }
+  }
+
+  const handleRemoveSlipImage = () => {
+    setSlip({
+      ...slip,
+      slipFile: null,
+      slipPreview: ''
+    })
+    if (slipFileInputRef.current) {
+      slipFileInputRef.current.value = ''
     }
   }
 
@@ -828,42 +882,64 @@ const AppointmentConfirm: FC = () => {
                         </div>
                       </div>
 
-                      <label className='label'>
-                        <span className='label mt-3'>
-                          {t('paymentSlipImage')}
-                        </span>
-                      </label>
-
-                      <div className='w-full h-52 md:h-84 rounded-3xl mt-3 relative'>
-                        {appointmentData.files?.slip?.f_appimageidpart ? (
-                          <div
-                            className='w-full h-full cursor-pointer hover:opacity-90 transition-opacity duration-300 ease-in-out'
-                            onClick={() => {
-                              setOpnemImage(
-                                import.meta.env.VITE_APP_IMG +
-                                  appointmentData.files?.appointment
-                                    ?.f_appimageidpart
-                              )
-                              openImageRef.current?.showModal()
-                            }}
-                          >
-                            <img
-                              src={
-                                import.meta.env.VITE_APP_IMG +
-                                appointmentData.files.slip.f_appimageidpart
-                              }
-                              alt='Preview'
-                              className='w-full h-full object-cover rounded-3xl'
-                            />
+                      <div className='form-control w-full'>
+                        <label className='label'>
+                          <span className='label mt-3'>
+                            {t('paymentSlipImage')}
+                          </span>
+                        </label>
+                        <div className='w-full h-52 md:h-84 rounded-3xl mt-3 relative'>
+                          <input
+                            type='file'
+                            accept='image/*'
+                            ref={slipFileInputRef}
+                            onChange={handleImageChange}
+                            className='hidden'
+                            id='imageUploader'
+                          />
+                          <div className='flex gap-3 overflow-x-auto h-full p-2 bg-base-200 rounded-3xl'>
+                            {slip.slipPreview ? (
+                              <div className='w-full h-full'>
+                                <img
+                                  src={slip.slipPreview}
+                                  alt='Preview'
+                                  className='w-full h-full object-cover rounded-3xl'
+                                />
+                                <button
+                                  onClick={handleRemoveSlipImage}
+                                  className='btn bg-black/30 text-white btn-circle btn-sm border-0 shadow-none absolute top-5 right-5'
+                                  aria-label='Remove image'
+                                >
+                                  <IoIosClose size={24} />
+                                </button>
+                              </div>
+                            ) : !isSlipResizing ? (
+                              <div
+                                className={`flex-shrink-0 w-full h-full rounded-2xl cursor-pointer transition-colors`}
+                                onClick={() =>
+                                  slipFileInputRef.current?.click()
+                                }
+                              >
+                                <div className='w-full h-full flex items-center justify-center bg-base-100 hover:bg-base-300/50 rounded-2xl border-2 border-dashed'>
+                                  {isBloodListResizing ? (
+                                    <span className='loading loading-spinner'></span>
+                                  ) : (
+                                    <div className='flex flex-col items-center text-base-content/50'>
+                                      <HiPlus size={32} />
+                                      <span className='text-xs mt-1'>
+                                        {t('addImage')}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className='w-full h-full md:h-full rounded-3xl flex justify-center items-center bg-base-200'>
+                                <span className='loading loading-spinner loading-md'></span>
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          <label className='w-full h-full md:h-full rounded-3xl flex flex-col justify-center items-center cursor-pointer bg-base-200 hover:bg-base-300 transition-colors'>
-                            <HiPhoto
-                              size={40}
-                              className='text-base-content/50 mb-2'
-                            />
-                          </label>
-                        )}
+                        </div>
                       </div>
                     </div>
                     <div className='w-full h-52 md:h-84'>
