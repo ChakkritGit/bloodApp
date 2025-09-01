@@ -88,25 +88,21 @@ const AppointmentConfirm: FC = () => {
   })
   const [zoom, setZoom] = useState(false)
   const [takenQueues, setTakenQueues] = useState<TakenQueue[]>([])
-  const paragraphRef = useRef<HTMLHeadingElement>(null)
-  const openImageRef = useRef<HTMLDialogElement>(null)
-  const hiddenDateInputRef = useRef<HTMLInputElement>(null)
-  const hiddenDateInputPatientServiceRef = useRef<HTMLInputElement>(null)
-
   const [testListFiles, setTestListFiles] = useState<File[]>([])
   const [testListPreviews, setTestListPreviews] = useState<string[]>([])
   const [isTestListResizing, setIsTestListResizing] = useState<boolean>(false)
-
   const [bloodListFiles, setBloodListFiles] = useState<File[]>([])
   const [bloodListPreviews, setBloodListPreviews] = useState<string[]>([])
   const [isBloodListResizing, setIsBloodListResizing] = useState<boolean>(false)
-
   const [slip, setSlip] = useState({
     slipFile: null as File | null,
     slipPreview: ''
   })
   const [isSlipResizing, setIsSlipResizing] = useState<boolean>(false)
-
+  const paragraphRef = useRef<HTMLHeadingElement>(null)
+  const openImageRef = useRef<HTMLDialogElement>(null)
+  const hiddenDateInputRef = useRef<HTMLInputElement>(null)
+  const hiddenDateInputPatientServiceRef = useRef<HTMLInputElement>(null)
   const testListFileInputRef = useRef<HTMLInputElement>(null)
   const bloodListFileInputRef = useRef<HTMLInputElement>(null)
   const slipFileInputRef = useRef<HTMLInputElement>(null)
