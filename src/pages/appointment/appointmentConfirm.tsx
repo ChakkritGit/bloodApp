@@ -24,6 +24,7 @@ const AppointmentConfirm: FC = () => {
   const { cookieDecode } = useSelector((state: RootState) => state.utils)
   const [isButtonFixed, setIsButtonFixed] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false)
   const [openImage, setOpnemImage] = useState('')
   const [appointmentData, setAppointmentData] = useState<Appointment>({
     f_appidno: '',
@@ -336,18 +337,64 @@ const AppointmentConfirm: FC = () => {
   }
 
   const handleSubmit = async () => {
+    const formData = new FormData()
+    const confirmNow = format(new Date(new Date()), 'd MMMM yyyy', {
+      locale: th
+    })
+    formData.append(
+      'f_appcreateconfirmname',
+      String(cookieDecode?.f_userfullname)
+    )
+    formData.append('f_appcreateconfirmdatetime', confirmNow)
+    formData.append(
+      'f_appadmindueque',
+      String(appointmentData.f_appadmindueque)
+    )
+    formData.append(
+      'f_appadminconfirmvisitedate',
+      String(appointmentData.f_appadminconfirmvisitedate)
+    )
+    formData.append(
+      'f_appadminduedate',
+      String(appointmentData.f_appadminduedate)
+    )
+    formData.append(
+      'f_apppatientproveinfobyname',
+      String(appointmentData.f_apppatientproveinfobyname)
+    )
+
+    testListFiles.forEach((file, _index) => {
+      formData.append('testListDocs', file)
+    })
+
+    bloodListFiles.forEach((file, _index) => {
+      formData.append('bloodTubes', file)
+    })
+    formData.append('slipDoc', slip.slipFile as File)
+
+    setIsSubmitLoading(true)
+
     try {
-      console.table(appointmentData)
-      // showToast({
-      //   type: 'success',
-      //   icon: BiCheck,
-      //   message: result.data.message,
-      //   duration: 3000,
-      //   showClose: false
-      // })
-      // navigate(`/appointment`, {
-      //   replace: true
-      // })
+      const result = await axios.put<ApiResponse<string>>(
+        `${import.meta.env.VITE_APP_API}/appointment/${id}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      )
+
+      showToast({
+        type: 'success',
+        icon: BiCheck,
+        message: result.data.message,
+        duration: 3000,
+        showClose: false
+      })
+      navigate(`/appointment/search/${appointmentData.f_appidno}`, {
+        replace: true
+      })
     } catch (error) {
       if (error instanceof AxiosError) {
         showToast({
@@ -360,6 +407,8 @@ const AppointmentConfirm: FC = () => {
       } else {
         console.error(error)
       }
+    } finally {
+      setIsSubmitLoading(false)
     }
   }
 
@@ -714,9 +763,7 @@ const AppointmentConfirm: FC = () => {
                       type='text'
                       placeholder={t('patientProveInfoByName')}
                       className='input input-bordered w-full h-13 rounded-3xl border-primary text-primary'
-                      value={
-                        appointmentData.f_apppatientproveinfobyname ?? ''
-                      }
+                      value={appointmentData.f_apppatientproveinfobyname ?? ''}
                       onChange={e =>
                         setAppointmentData({
                           ...appointmentData,
@@ -776,7 +823,7 @@ const AppointmentConfirm: FC = () => {
                         <span className='label'>{t('testListImage')}</span>
                       </label>
 
-                      <div className='w-full min-h-[13rem] mt-3 relative'>
+                      <div className='w-full h-52 md:h-84 mt-3 relative'>
                         <input
                           type='file'
                           accept='image/*'
@@ -792,7 +839,7 @@ const AppointmentConfirm: FC = () => {
                             <div
                               className={`flex-shrink-0 ${
                                 testListFiles.length === 0 ? 'w-full' : 'w-32'
-                              } h-44 rounded-2xl cursor-pointer transition-colors`}
+                              } h-full rounded-2xl cursor-pointer transition-colors`}
                               onClick={() =>
                                 testListFileInputRef.current?.click()
                               }
@@ -842,7 +889,7 @@ const AppointmentConfirm: FC = () => {
                         <span className='label'>{t('bloodTubsImage')}</span>
                       </label>
 
-                      <div className='w-full min-h-[13rem] mt-3 relative'>
+                      <div className='w-full h-52 md:h-84 mt-3 relative'>
                         <input
                           type='file'
                           accept='image/*'
@@ -858,7 +905,7 @@ const AppointmentConfirm: FC = () => {
                             <div
                               className={`flex-shrink-0 ${
                                 bloodListFiles.length === 0 ? 'w-full' : 'w-32'
-                              } h-44 rounded-2xl cursor-pointer transition-colors`}
+                              } h-full rounded-2xl cursor-pointer transition-colors`}
                               onClick={() =>
                                 bloodListFileInputRef.current?.click()
                               }
@@ -1014,8 +1061,13 @@ const AppointmentConfirm: FC = () => {
                       // disabled={!consent}
                       className='btn btn-primary w-full h-13 rounded-3xl text-lg font-bold'
                       onClick={handleSubmit}
+                      disabled={isSubmitLoading}
                     >
-                      {t('saveButton')}
+                      {isSubmitLoading ? (
+                        <span className='loading loading-spinner loading-md'></span>
+                      ) : (
+                        t('saveButton')
+                      )}
                     </button>
                     <button
                       className='btn w-full h-13 rounded-3xl text-lg font-bold'
@@ -1053,14 +1105,16 @@ const AppointmentConfirm: FC = () => {
             </button>
           </form>
           <div className='mt-12 max-h-[70dvh] overflow-auto flex items-start justify-center'>
-            {openImage && <img
-              src={openImage}
-              alt='Preview'
-              onClick={() => setZoom(!zoom)}
-              className={`rounded-3xl object-contain transition-transform duration-300 cursor-zoom-in ${
-                zoom ? 'scale-200 cursor-zoom-out' : 'scale-100'
-              }`}
-            />}
+            {openImage && (
+              <img
+                src={openImage}
+                alt='Preview'
+                onClick={() => setZoom(!zoom)}
+                className={`rounded-3xl object-contain transition-transform duration-300 cursor-zoom-in ${
+                  zoom ? 'scale-200 cursor-zoom-out' : 'scale-100'
+                }`}
+              />
+            )}
           </div>
         </div>
       </dialog>
