@@ -338,17 +338,17 @@ const AppointmentConfirm: FC = () => {
 
   const handleSubmit = async () => {
     const formData = new FormData()
-    const confirmNow = format(new Date(new Date()), 'd MMMM yyyy', {
-      locale: th
-    })
+    const today = new Date()
+    const formattedDate = format(today, 'yyyy-MM-dd')
+
     formData.append(
       'f_appcreateconfirmname',
       String(cookieDecode?.f_userfullname)
     )
-    formData.append('f_appcreateconfirmdatetime', confirmNow)
+    formData.append('f_appcreateconfirmdatetime', formattedDate)
     formData.append(
-      'f_appadmindueque',
-      String(appointmentData.f_appadmindueque)
+      'f_appadminduequemax',
+      String(appointmentData.f_appadminduequemax)
     )
     formData.append(
       'f_appadminconfirmvisitedate',
@@ -636,7 +636,7 @@ const AppointmentConfirm: FC = () => {
                           onQueueSelect={queue =>
                             setAppointmentData({
                               ...appointmentData,
-                              f_appadmindueque: queue as number
+                              f_appadminduequemax: queue as number
                             })
                           }
                         />
