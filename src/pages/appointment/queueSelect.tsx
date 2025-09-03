@@ -2,7 +2,7 @@ import { FC, useState, useMemo } from 'react'
 
 export interface TakenQueue {
   f_appidno: string
-  f_appadmindueque: number
+  f_appadminduequemax: number
 }
 
 interface QueueSelectorProps {
@@ -19,7 +19,7 @@ const QueueSelector: FC<QueueSelectorProps> = ({
   const [selectedQueue, setSelectedQueue] = useState<number | null>(null)
 
   const takenQueueSet = useMemo(
-    () => new Set(takenQueues.map(q => q.f_appadmindueque)),
+    () => new Set(takenQueues.map(q => q.f_appadminduequemax)),
     [takenQueues]
   )
 
