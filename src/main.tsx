@@ -1,4 +1,5 @@
 import './index.css'
+import 'react-day-picker/dist/style.css'
 import Routes from './routes/routes'
 import isPropValid from '@emotion/is-prop-valid'
 import store from './redux/store'

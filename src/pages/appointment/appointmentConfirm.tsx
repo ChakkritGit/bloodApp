@@ -1,4 +1,11 @@
-import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
+import {
+  ChangeEvent,
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Appointment } from '../../types/appointment.type'
@@ -10,7 +17,7 @@ import {
   HiPhoto,
   HiPlus
 } from 'react-icons/hi2'
-import { format, parseISO } from 'date-fns'
+import { format } from 'date-fns'
 import { th } from 'date-fns/locale'
 import LocationMap from '../../utils/LocationMap'
 import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
@@ -22,6 +29,8 @@ import QueueSelector, { TakenQueue } from './queueSelect'
 import { showToast } from '../../utils/toast'
 import { BiCheck, BiError } from 'react-icons/bi'
 import { resizeImage } from '../../constants/utils/image'
+import { ThaiDatePicker } from '../../components/datePicker/ThaiDatePicker'
+import { DateTimePicker } from '../../components/datePicker/DateTimePicker'
 
 const AppointmentConfirm: FC = () => {
   const { t } = useTranslation()
@@ -108,8 +117,6 @@ const AppointmentConfirm: FC = () => {
   const [isSlipResizing, setIsSlipResizing] = useState<boolean>(false)
   const paragraphRef = useRef<HTMLHeadingElement>(null)
   const openImageRef = useRef<HTMLDialogElement>(null)
-  const hiddenDateInputRef = useRef<HTMLInputElement>(null)
-  const hiddenDateInputPatientServiceRef = useRef<HTMLInputElement>(null)
   const testListFileInputRef = useRef<HTMLInputElement>(null)
   const bloodListFileInputRef = useRef<HTMLInputElement>(null)
   const slipFileInputRef = useRef<HTMLInputElement>(null)
@@ -301,34 +308,6 @@ const AppointmentConfirm: FC = () => {
     }
   }
 
-  const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newLocalDateTime = e.target.value
-
-    if (newLocalDateTime) {
-      const newIsoStringForAPI = `${newLocalDateTime}:00.000Z`
-
-      setAppointmentData({
-        ...appointmentData,
-        f_appadminconfirmvisitedate: newIsoStringForAPI
-      })
-    }
-  }
-
-  const handleDateChangePatientService = (e: any) => {
-    setAppointmentData({
-      ...appointmentData,
-      f_appadminduedate: e.target.value
-    })
-  }
-
-  const handleVisibleInputClick = () => {
-    hiddenDateInputRef.current?.showPicker()
-  }
-
-  const handleVisibleInputPatientServiceClick = () => {
-    hiddenDateInputPatientServiceRef.current?.showPicker()
-  }
-
   const fetchAppointment = async () => {
     setIsLoading(true)
     try {
@@ -447,22 +426,15 @@ const AppointmentConfirm: FC = () => {
     }
   }
 
+  const handleDateTimeChange = useCallback((isoString: string) => {
+    setAppointmentData(prevData => ({
+      ...prevData,
+      f_appadminconfirmvisitedate: isoString
+    }))
+  }, [])
+
   const formattedThaiDateDuedate = appointmentData.f_appdoctorduedate
     ? format(new Date(appointmentData.f_appdoctorduedate), 'd MMMM yyyy', {
-        locale: th
-      })
-    : ''
-
-  const formattedThaiDate = appointmentData.f_appadminconfirmvisitedate
-    ? format(
-        parseISO(appointmentData.f_appadminconfirmvisitedate.slice(0, -1)),
-        'd MMMM yyyy HH:mm',
-        { locale: th }
-      )
-    : ''
-
-  const formattedThaiServiceDate = appointmentData.f_appadminduedate
-    ? format(new Date(appointmentData.f_appadminduedate), 'd MMMM yyyy', {
         locale: th
       })
     : ''
@@ -657,24 +629,12 @@ const AppointmentConfirm: FC = () => {
                     </div>
                     <div className='form-control'>
                       <label className='label'>
-                        <span className='label'>{t('visitDate')}</span>
+                        <span className='label-text'>{t('visitDate')}</span>
                       </label>
 
-                      <input
-                        type='text'
-                        readOnly
-                        value={formattedThaiDate}
-                        onClick={handleVisibleInputClick}
-                        className='input input-bordered w-full h-13 rounded-3xl border-primary text-primary cursor-pointer'
-                        placeholder='กรุณาเลือกวันที่และเวลา'
-                      />
-
-                      <input
-                        type='datetime-local'
-                        ref={hiddenDateInputRef}
+                      <DateTimePicker
                         value={datetimeLocalValue}
-                        onChange={handleDateChange}
-                        className='hidden'
+                        onChange={handleDateTimeChange}
                       />
                     </div>
                   </div>
@@ -722,23 +682,16 @@ const AppointmentConfirm: FC = () => {
 
                     <div className='form-control'>
                       <label className='label'>
-                        <span className='label'>{t('serviceDate')}</span>
+                        <span className='label-text'>{t('serviceDate')}</span>
                       </label>
-                      <input
-                        type='text'
-                        readOnly
-                        value={formattedThaiServiceDate}
-                        onClick={handleVisibleInputPatientServiceClick}
-                        className='input input-bordered w-full h-13 rounded-3xl border-primary text-primary cursor-pointer'
-                        placeholder='กรุณาเลือกวันที่'
-                      />
-
-                      <input
-                        type='date'
-                        ref={hiddenDateInputPatientServiceRef}
+                      <ThaiDatePicker
                         value={appointmentData.f_appadminduedate ?? ''}
-                        onChange={handleDateChangePatientService}
-                        className='hidden'
+                        onChange={dateString => {
+                          setAppointmentData(prev => ({
+                            ...prev,
+                            f_appadminduedate: dateString
+                          }))
+                        }}
                       />
                     </div>
 

@@ -24,6 +24,7 @@
     "jwt-decode": "^4.0.0",
     "react": "^19.1.1",
     "react-data-table-component": "^7.7.0",
+    "react-day-picker": "^9.9.0",
     "react-dom": "^19.1.1",
     "react-hot-toast": "^2.6.0",
     "react-i18next": "^15.7.3",

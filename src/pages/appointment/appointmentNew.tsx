@@ -1,7 +1,5 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { format } from 'date-fns'
-import { th } from 'date-fns/locale'
 import { HiMapPin, HiPhoto } from 'react-icons/hi2'
 import { useTranslation } from 'react-i18next'
 import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
@@ -12,6 +10,7 @@ import { resizeImage } from '../../constants/utils/image'
 import { ApiResponse } from '../../types/api.response.type'
 import axios, { AxiosError } from 'axios'
 import LocationMap from '../../utils/LocationMap'
+import { ThaiDatePicker } from '../../components/datePicker/ThaiDatePicker'
 
 const AppointmentNew = () => {
   const { t } = useTranslation()
@@ -34,7 +33,6 @@ const AppointmentNew = () => {
   })
   const [consent, setConsent] = useState(false)
   const [isImageResizing, setIsImageResizing] = useState(false)
-  const hiddenDateInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const paragraphRef = useRef<HTMLHeadingElement>(null)
 
@@ -119,23 +117,6 @@ const AppointmentNew = () => {
   ) => {
     const { name, value } = e.target
     setAppointmentData(prev => ({ ...prev, [name]: value }))
-  }
-
-  const formattedThaiDate = appointmentData.f_appdoctorduedate
-    ? format(new Date(appointmentData.f_appdoctorduedate), 'd MMMM yyyy', {
-        locale: th
-      })
-    : t('selectDate')
-
-  const handleDateChange = (e: any) => {
-    setAppointmentData({
-      ...appointmentData,
-      f_appdoctorduedate: e.target.value
-    })
-  }
-
-  const handleVisibleInputClick = () => {
-    hiddenDateInputRef.current?.showPicker()
   }
 
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -380,23 +361,18 @@ const AppointmentNew = () => {
                 </div>
                 <div className='form-control'>
                   <label className='label'>
-                    <span className='label'>{t('scheduledDoctorVisit')}</span>
+                    <span className='label-text'>
+                      {t('scheduledDoctorVisit')}
+                    </span>
                   </label>
-                  <input
-                    type='text'
-                    readOnly
-                    value={formattedThaiDate}
-                    onClick={handleVisibleInputClick}
-                    className='input input-bordered w-full h-13 rounded-3xl cursor-pointer'
-                    placeholder='กรุณาเลือกวันที่'
-                  />
-
-                  <input
-                    type='date'
-                    ref={hiddenDateInputRef}
+                  <ThaiDatePicker
                     value={appointmentData.f_appdoctorduedate}
-                    onChange={handleDateChange}
-                    className='hidden'
+                    onChange={dateString => {
+                      setAppointmentData(prev => ({
+                        ...prev,
+                        f_appdoctorduedate: dateString
+                      }))
+                    }}
                   />
                 </div>
                 <div className='form-control'>
