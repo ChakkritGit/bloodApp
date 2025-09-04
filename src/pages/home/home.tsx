@@ -153,6 +153,12 @@ const Home = () => {
               <p className='text-sm text-base-content/70 truncate'>
                 HN: {appointment.f_appcreateforhn || '-'}
               </p>
+              <h2
+                className='card-title text-primary text-xl font-bold truncate'
+                title={appointment.f_appidno}
+              >
+                {appointment.f_appidno}
+              </h2>
             </div>
           </div>
 
@@ -177,29 +183,28 @@ const Home = () => {
 
           <div className='card-actions mt-6'>
             <div className='flex gap-3 w-full'>
-              {
-                appointment.f_appstepno !== 4 &&
+              {appointment.f_appstepno !== 4 && (
                 <button
-                onClick={async () => {
-                  const confirmed = await confirmModalRef.current?.show({
-                    title: t('cancelQueue'),
-                    description: t('cancelQueueDescription'),
-                    buttonConfirmText: t('okButton'),
-                    type: 'error'
-                  })
+                  onClick={async () => {
+                    const confirmed = await confirmModalRef.current?.show({
+                      title: t('cancelQueue'),
+                      description: t('cancelQueueDescription'),
+                      buttonConfirmText: t('okButton'),
+                      type: 'error'
+                    })
 
-                  if (confirmed) {
-                    onCancel(appointment.f_appidno)
-                  }
-                }}
-                className={`btn btn-outline btn-error flex-1 rounded-3xl ${
-                  appointment.f_appstepno === 5 ? 'pointer-events-none' : ''
-                }`}
-              >
-                <HiMiniXCircle size={20} />
-                {t('closeButton')}
-              </button>
-              }
+                    if (confirmed) {
+                      onCancel(appointment.f_appidno)
+                    }
+                  }}
+                  className={`btn btn-outline btn-error flex-1 rounded-3xl ${
+                    appointment.f_appstepno === 5 ? 'pointer-events-none' : ''
+                  }`}
+                >
+                  <HiMiniXCircle size={20} />
+                  {t('closeButton')}
+                </button>
+              )}
               {appointment.f_appstepno !== 5 && (
                 <button
                   onClick={() =>
@@ -230,7 +235,8 @@ const Home = () => {
     const searchMachine = filtered.filter(
       m =>
         m.f_appcreateforname.toLowerCase().includes(search.toLowerCase()) ||
-        m.f_appcreateforhn.toLowerCase().includes(search.toLowerCase())
+        m.f_appcreateforhn.toLowerCase().includes(search.toLowerCase()) ||
+        m.f_appidno.toLowerCase().includes(search.toLowerCase())
     )
 
     return searchMachine

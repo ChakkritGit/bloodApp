@@ -31,6 +31,7 @@ import { BiCheck, BiError } from 'react-icons/bi'
 import { resizeImage } from '../../constants/utils/image'
 import { ThaiDatePicker } from '../../components/datePicker/ThaiDatePicker'
 import { DateTimePicker } from '../../components/datePicker/DateTimePicker'
+import { toThailandISOString } from '../../utils/time'
 
 const AppointmentConfirm: FC = () => {
   const { t } = useTranslation()
@@ -343,7 +344,7 @@ const AppointmentConfirm: FC = () => {
     )
     formData.append(
       'f_appadminconfirmvisitedate',
-      String(appointmentData.f_appadminconfirmvisitedate)
+      toThailandISOString(String(appointmentData.f_appadminconfirmvisitedate))
     )
     formData.append(
       'f_appadminduedate',
@@ -685,7 +686,7 @@ const AppointmentConfirm: FC = () => {
                         <span className='label-text'>{t('serviceDate')}</span>
                       </label>
                       <ThaiDatePicker
-                        value={appointmentData.f_appadminduedate ?? ''}
+                        value={appointmentData.f_appadminduedate}
                         onChange={dateString => {
                           setAppointmentData(prev => ({
                             ...prev,

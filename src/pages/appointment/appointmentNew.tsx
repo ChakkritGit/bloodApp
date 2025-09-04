@@ -4,7 +4,7 @@ import { HiMapPin, HiPhoto } from 'react-icons/hi2'
 import { useTranslation } from 'react-i18next'
 import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
 import { showToast } from '../../utils/toast'
-import { BiCheck, BiError } from 'react-icons/bi'
+import { BiCheck, BiError, BiErrorCircle } from 'react-icons/bi'
 import { AppointmentState } from '../../types/appointment.type'
 import { resizeImage } from '../../constants/utils/image'
 import { ApiResponse } from '../../types/api.response.type'
@@ -37,54 +37,54 @@ const AppointmentNew = () => {
   const paragraphRef = useRef<HTMLHeadingElement>(null)
 
   const handleSubmit = async () => {
+    const fields = {
+      f_appidno: appointmentData.f_appidno,
+      f_appcreatebyname: appointmentData.f_appcreatebyname,
+      f_appcreateforhn: appointmentData.f_appcreateforhn,
+      f_appcreateforname: appointmentData.f_appcreateforname,
+      f_appcreatecontacttelephone: appointmentData.f_appcreatecontacttelephone,
+      f_appcreatecontacttelephonetwo:
+        appointmentData.f_appcreatecontacttelephonetwo,
+      f_appcreatecontactaddress: appointmentData.f_appcreatecontactaddress,
+      f_appcreatecontactlat: appointmentData.f_appcreatecontactlat,
+      f_appcreatecontactlon: appointmentData.f_appcreatecontactlon,
+      f_appdoctorduedate: appointmentData.f_appdoctorduedate,
+      appointmentDoc: appointmentData.selectedFile
+    }
+
+    const optionalFields = ['f_appcreatecontacttelephonetwo']
+
+    const emptyFields = Object.entries(fields).filter(
+      ([key, value]) =>
+        !optionalFields.includes(key) &&
+        (value === null || value === undefined || value === '')
+    )
+
+    if (emptyFields.length > 0) {
+      showToast({
+        type: 'warning',
+        icon: BiErrorCircle,
+        message: `กรุณากรอกข้อมูลให้ครบ`,
+        duration: 5000,
+        showClose: true
+      })
+      return
+    }
+
     const formData = new FormData()
-    formData.append('f_appidno', String(appointmentData.f_appidno))
-    formData.append(
-      'f_appcreatebyname',
-      String(appointmentData.f_appcreatebyname)
-    )
-    formData.append(
-      'f_appcreateforhn',
-      String(appointmentData.f_appcreateforhn)
-    )
-    formData.append(
-      'f_appcreateforname',
-      String(appointmentData.f_appcreateforname)
-    )
-    formData.append(
-      'f_appcreatecontacttelephone',
-      String(appointmentData.f_appcreatecontacttelephone)
-    )
-    formData.append(
-      'f_appcreatecontacttelephonetwo',
-      String(appointmentData.f_appcreatecontacttelephonetwo)
-    )
-    formData.append(
-      'f_appcreatecontactaddress',
-      String(appointmentData.f_appcreatecontactaddress)
-    )
-    formData.append(
-      'f_appcreatecontactlat',
-      String(appointmentData.f_appcreatecontactlat)
-    )
-    formData.append(
-      'f_appcreatecontactlon',
-      String(appointmentData.f_appcreatecontactlon)
-    )
-    formData.append(
-      'f_appdoctorduedate',
-      String(appointmentData.f_appdoctorduedate)
-    )
-    formData.append('appointmentDoc', appointmentData.selectedFile as File)
+    Object.entries(fields).forEach(([key, value]) => {
+      if (value instanceof File) {
+        formData.append(key, value)
+      } else if (value !== null && value !== undefined && value !== '') {
+        formData.append(key, String(value))
+      }
+    })
+
     try {
       const result = await axios.post<ApiResponse<string>>(
         `${import.meta.env.VITE_APP_API}/appointment`,
         formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       )
 
       showToast({
@@ -94,6 +94,7 @@ const AppointmentNew = () => {
         duration: 3000,
         showClose: false
       })
+
       navigate(`/appointment/search/${appointmentData.f_appidno}`, {
         replace: true
       })

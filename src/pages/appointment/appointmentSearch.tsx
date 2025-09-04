@@ -89,15 +89,26 @@ const AppointmentSearch = () => {
       })
     : t('selectDate')
 
-  const formattedThaiServiceDate = appointmentData.f_appadminduedate ? (
-    format(new Date(appointmentData.f_appadminduedate), 'd MMMM yyyy', {
-      locale: th
-    })
-  ) : (
-    <div className='font-medium text-primary'>
-      <IoIosRemove size={32} />
-    </div>
-  )
+  let formattedThaiServiceDate
+
+  if (appointmentData.f_appadminduedate) {
+    const dateObj = new Date(appointmentData.f_appadminduedate)
+    if (!isNaN(dateObj.getTime())) {
+      formattedThaiServiceDate = format(dateObj, 'd MMMM yyyy', { locale: th })
+    } else {
+      formattedThaiServiceDate = (
+        <div className='font-medium text-primary'>
+          <IoIosRemove size={32} />
+        </div>
+      )
+    }
+  } else {
+    formattedThaiServiceDate = (
+      <div className='font-medium text-primary'>
+        <IoIosRemove size={32} />
+      </div>
+    )
+  }
 
   const statusMap: Record<number, string> = {
     1: t('stepAppOne'),
@@ -633,14 +644,16 @@ const AppointmentSearch = () => {
             </button>
           </form>
           <div className='mt-12 max-h-[70dvh] overflow-auto flex items-start justify-center'>
-            <img
-              src={openImage}
-              alt='Preview'
-              onClick={() => setZoom(!zoom)}
-              className={`rounded-3xl transition-transform duration-300 cursor-zoom-in ${
-                zoom ? 'scale-200 cursor-zoom-out' : 'scale-100'
-              }`}
-            />
+            {openImage && (
+              <img
+                src={openImage}
+                alt='Preview'
+                onClick={() => setZoom(!zoom)}
+                className={`rounded-3xl transition-transform duration-300 cursor-zoom-in ${
+                  zoom ? 'scale-200 cursor-zoom-out' : 'scale-100'
+                }`}
+              />
+            )}
           </div>
         </div>
       </dialog>
