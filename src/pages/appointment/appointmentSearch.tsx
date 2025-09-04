@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ApiResponse } from '../../types/api.response.type'
 import { Appointment } from '../../types/appointment.type'
 import { useTranslation } from 'react-i18next'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { th } from 'date-fns/locale'
 import { IoIosArrowBack, IoIosRemove } from 'react-icons/io'
 import { HiMapPin, HiMiniXMark, HiPhoto } from 'react-icons/hi2'
@@ -298,19 +298,21 @@ const AppointmentSearch = () => {
                       <div className='inline-flex items-center font-medium text-base text-primary h-10 w-full'>
                         {appointmentData.f_appadminduequemax ? (
                           <div className='flex flex-col'>
-                            <span>
-                              {appointmentData.f_appadminduequemax}
-                            </span>
+                            <div className='flex items-center gap-1'>
+                              <span>{appointmentData.f_appadminduequemax}</span>
+                              <span className='text-base-content'>/ 30</span>
+                            </div>
                             <span className='text-sm'>
                               {appointmentData.f_appadminconfirmvisitedate
                                 ? format(
-                                    new Date(
-                                      appointmentData.f_appadminconfirmvisitedate
+                                    parseISO(
+                                      appointmentData.f_appadminconfirmvisitedate.slice(
+                                        0,
+                                        -1
+                                      )
                                     ),
-                                    'd MMMM yyyy',
-                                    {
-                                      locale: th
-                                    }
+                                    'd MMMM yyyy HH:mm',
+                                    { locale: th }
                                   )
                                 : '—'}
                             </span>

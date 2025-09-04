@@ -69,6 +69,12 @@ export default {
     visitDate: 'เวลาที่เข้าบริการให้ผู้ป่วย',
     confirmAdmin: 'ผู้ดำเนินการ',
     patientProveInfoByName: 'ชื่อผู้เข้าบริการผู้ป่วย',
-    addImage: 'เพิ่มรูปภาพ'
+    addImage: 'เพิ่มรูปภาพ',
+    deleteApp: 'ลบใบนัดหมาย',
+    createNewAccount: 'สร้างผู้ใช้',
+    fillInfoToStart: 'กรอกข้อมูลเพื่อเริ่ม',
+    accountInfo: 'ข้อมูลผู้ใช้',
+    fullName: 'ชื่อเต็ม',
+    registerButton: 'บันทึก'
   }
 }

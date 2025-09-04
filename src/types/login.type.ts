@@ -5,4 +5,11 @@ type LoginResponse = {
   f_userstatus: number
 }
 
-export type { LoginResponse }
+type UserRegister = {
+  f_id: string
+  f_username: string
+  f_userfullname: string
+  f_userstatus: number | null
+}
+
+export type { LoginResponse, UserRegister }

@@ -4,7 +4,7 @@ import {
   HiCalendarDays,
   HiChevronDown,
   HiChevronUp,
-  HiCog6Tooth,
+  // HiCog6Tooth,
   HiHome,
   HiLanguage,
   HiMiniArrowRightStartOnRectangle,
@@ -86,7 +86,7 @@ const Navbar = () => {
                 <span>{t('manageUser')}</span>
               </Link>
             </li>
-            <li>
+            {/* <li>
               <Link
                 to='/appointment/setting'
                 className={`flex items-center h-12 rounded-3xl gap-2 text-base ${
@@ -98,7 +98,7 @@ const Navbar = () => {
                 <HiCog6Tooth size={24} />
                 <span>{t('manageSetting')}</span>
               </Link>
-            </li>
+            </li> */}
             <div className='divider my-0'></div>
             <li
               className='dropdown dropdown-end w-full'

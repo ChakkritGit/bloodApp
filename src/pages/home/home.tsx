@@ -78,8 +78,12 @@ const Home = () => {
     }
   }
 
-  const onViewDetails = (appId: string) => {
-    navigate(`/appointment/confirm/${appId}`)
+  const onViewDetails = (appId: string, stepNo: number) => {
+    if (stepNo !== 4) {
+      navigate(`/appointment/confirm/${appId}`)
+    } else {
+      navigate(`/appointment/search/${appId}`)
+    }
   }
 
   useEffect(() => {
@@ -126,9 +130,7 @@ const Home = () => {
     return (
       <div
         key={appointment.f_appidno}
-        className={`card w-full max-w-sm bg-base-100 rounded-[40px] shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
-          status.text.includes(t('stepAppFri')) ? 'opacity-60' : ''
-        }`}
+        className={`card w-full max-w-sm bg-base-100 rounded-[40px] shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300`}
       >
         <div className='card-body p-6'>
           <div className='flex items-center justify-between'>
@@ -175,35 +177,43 @@ const Home = () => {
 
           <div className='card-actions mt-6'>
             <div className='flex gap-3 w-full'>
-              {!status.text.includes(t('stepAppFour')) && (
+              {
+                appointment.f_appstepno !== 4 &&
                 <button
-                  onClick={async () => {
-                    const confirmed = await confirmModalRef.current?.show({
-                      title: t('cancelQueue'),
-                      description: t('cancelQueueDescription'),
-                      buttonConfirmText: t('okButton'),
-                      type: 'error'
-                    })
+                onClick={async () => {
+                  const confirmed = await confirmModalRef.current?.show({
+                    title: t('cancelQueue'),
+                    description: t('cancelQueueDescription'),
+                    buttonConfirmText: t('okButton'),
+                    type: 'error'
+                  })
 
-                    if (confirmed) {
-                      onCancel(appointment.f_appidno)
-                    }
-                  }}
-                  className={`btn btn-outline btn-error flex-1 rounded-3xl ${
-                    status.text.includes('ยกเลิก') ? 'pointer-events-none' : ''
-                  }`}
+                  if (confirmed) {
+                    onCancel(appointment.f_appidno)
+                  }
+                }}
+                className={`btn btn-outline btn-error flex-1 rounded-3xl ${
+                  appointment.f_appstepno === 5 ? 'pointer-events-none' : ''
+                }`}
+              >
+                <HiMiniXCircle size={20} />
+                {t('closeButton')}
+              </button>
+              }
+              {appointment.f_appstepno !== 5 && (
+                <button
+                  onClick={() =>
+                    onViewDetails(
+                      appointment.f_appidno,
+                      appointment.f_appstepno
+                    )
+                  }
+                  className='btn btn-primary flex-2 rounded-3xl'
                 >
-                  <HiMiniXCircle size={20} />
-                  {t('closeButton')}
+                  <HiPencilSquare size={20} />
+                  {t('viewAndEdit')}
                 </button>
               )}
-              <button
-                onClick={() => onViewDetails(appointment.f_appidno)}
-                className='btn btn-primary flex-2 rounded-3xl'
-              >
-                <HiPencilSquare size={20} />
-                {t('viewAndEdit')}
-              </button>
             </div>
           </div>
         </div>

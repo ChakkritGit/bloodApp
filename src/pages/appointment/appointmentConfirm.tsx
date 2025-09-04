@@ -3,8 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Appointment } from '../../types/appointment.type'
 import { delay } from '../../constants/utils/utilsConstants'
-import { HiMapPin, HiMiniXMark, HiPhoto, HiPlus } from 'react-icons/hi2'
-import { format } from 'date-fns'
+import {
+  HiMapPin,
+  // HiMiniTrash,
+  HiMiniXMark,
+  HiPhoto,
+  HiPlus
+} from 'react-icons/hi2'
+import { format, parseISO } from 'date-fns'
 import { th } from 'date-fns/locale'
 import LocationMap from '../../utils/LocationMap'
 import { IoIosArrowBack, IoIosClose, IoIosRemove } from 'react-icons/io'
@@ -295,11 +301,17 @@ const AppointmentConfirm: FC = () => {
     }
   }
 
-  const handleDateChange = (e: any) => {
-    setAppointmentData({
-      ...appointmentData,
-      f_appadminconfirmvisitedate: e.target.value
-    })
+  const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newLocalDateTime = e.target.value
+
+    if (newLocalDateTime) {
+      const newIsoStringForAPI = `${newLocalDateTime}:00.000Z`
+
+      setAppointmentData({
+        ...appointmentData,
+        f_appadminconfirmvisitedate: newIsoStringForAPI
+      })
+    }
   }
 
   const handleDateChangePatientService = (e: any) => {
@@ -443,7 +455,7 @@ const AppointmentConfirm: FC = () => {
 
   const formattedThaiDate = appointmentData.f_appadminconfirmvisitedate
     ? format(
-        new Date(appointmentData.f_appadminconfirmvisitedate),
+        parseISO(appointmentData.f_appadminconfirmvisitedate.slice(0, -1)),
         'd MMMM yyyy HH:mm',
         { locale: th }
       )
@@ -509,6 +521,9 @@ const AppointmentConfirm: FC = () => {
 
     fetchTakenQueues()
   }, [])
+
+  const isoString = appointmentData.f_appadminconfirmvisitedate
+  const datetimeLocalValue = isoString ? isoString.slice(0, 16) : ''
 
   return (
     <div className='min-h-screen'>
@@ -657,9 +672,7 @@ const AppointmentConfirm: FC = () => {
                       <input
                         type='datetime-local'
                         ref={hiddenDateInputRef}
-                        value={
-                          appointmentData.f_appadminconfirmvisitedate ?? ''
-                        }
+                        value={datetimeLocalValue}
                         onChange={handleDateChange}
                         className='hidden'
                       />
@@ -1080,6 +1093,18 @@ const AppointmentConfirm: FC = () => {
                 </section>
               </div>
             </div>
+            {/* <div className='my-10'>
+              <div className='divider'></div>
+              <button
+                className={`btn btn-ghost items-center gap-3 text-red-500 w-full h-13 rounded-3xl text-base ${
+                  appointmentData.f_appstepno === 4 ? 'opacity-50' : ''
+                }`}
+                disabled={appointmentData.f_appstepno === 4}
+              >
+                <HiMiniTrash size={20} />
+                <span>{t('deleteApp')}</span>
+              </button>
+            </div> */}
           </div>
         </>
       ) : (

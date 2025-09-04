@@ -9,8 +9,9 @@ import AppointmentSearch from '../pages/appointment/appointmentSearch'
 import Layout from '../pages/layout/layout'
 import Home from '../pages/home/home'
 import User from '../pages/user/user'
-import Setting from '../pages/setting/setting'
+// import Setting from '../pages/setting/setting'
 import AppointmentConfirm from '../pages/appointment/appointmentConfirm'
+import Register from '../pages/user/register'
 
 const router = () =>
   createBrowserRouter([
@@ -49,10 +50,15 @@ const router = () =>
               errorElement: <ErrorPage />
             },
             {
-              path: '/appointment/setting',
-              element: <Setting />,
+              path: '/appointment/user/register',
+              element:  <Register />,
               errorElement: <ErrorPage />
             },
+            // {
+            //   path: '/appointment/setting',
+            //   element: <Setting />,
+            //   errorElement: <ErrorPage />
+            // },
             {
               path: '/appointment/confirm/:id',
               element: <AppointmentConfirm />,

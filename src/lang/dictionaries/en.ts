@@ -69,6 +69,12 @@ export default {
     visitDate: 'Patient service time',
     confirmAdmin: 'Confirm by',
     patientProveInfoByName: 'Patient prove info by name',
-    addImage: 'Add image'
+    addImage: 'Add image',
+    deleteApp: 'Delete appoientment',
+    createNewAccount: 'Register user',
+    fillInfoToStart: 'Fill info to start',
+    accountInfo: 'Account Info',
+    fullName: 'Fullname',
+    registerButton: 'Submit'
   }
 }
