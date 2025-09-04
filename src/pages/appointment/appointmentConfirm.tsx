@@ -444,10 +444,8 @@ const AppointmentConfirm: FC = () => {
   const formattedThaiDate = appointmentData.f_appadminconfirmvisitedate
     ? format(
         new Date(appointmentData.f_appadminconfirmvisitedate),
-        'd MMMM yyyy',
-        {
-          locale: th
-        }
+        'd MMMM yyyy HH:mm',
+        { locale: th }
       )
     : ''
 
@@ -646,17 +644,18 @@ const AppointmentConfirm: FC = () => {
                       <label className='label'>
                         <span className='label'>{t('visitDate')}</span>
                       </label>
+
                       <input
                         type='text'
                         readOnly
                         value={formattedThaiDate}
                         onClick={handleVisibleInputClick}
                         className='input input-bordered w-full h-13 rounded-3xl border-primary text-primary cursor-pointer'
-                        placeholder='กรุณาเลือกวันที่'
+                        placeholder='กรุณาเลือกวันที่และเวลา'
                       />
 
                       <input
-                        type='date'
+                        type='datetime-local'
                         ref={hiddenDateInputRef}
                         value={
                           appointmentData.f_appadminconfirmvisitedate ?? ''
