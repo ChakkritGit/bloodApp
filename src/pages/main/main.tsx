@@ -1,4 +1,4 @@
-import appLogo from '../../assets/images/appLogo.png'
+// import appLogo from '../../assets/images/appLogo.png'
 import { FormEvent, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
@@ -8,6 +8,7 @@ import { BiError, BiErrorCircle } from 'react-icons/bi'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '../../types/api.response.type'
 import { Appointment } from '../../types/appointment.type'
+import Logo from '../../assets/images/yommarat.webp'
 
 const Main = () => {
   const { t } = useTranslation()
@@ -76,7 +77,7 @@ const Main = () => {
           <form onSubmit={handleSearch} className='card-body gap-3'>
             <div className='avatar justify-center mb-5'>
               <div className='w-18 rounded-3xl'>
-                <img src={appLogo} />
+                <img src={Logo} />
               </div>
             </div>
 
